@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="44" viewBox="0 0 220 44">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00E5A8"/>
+      <stop offset="1" stop-color="#5EF2CA"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="4" rx="10" ry="10" width="44" height="36" fill="url(#g)"/>
+  <path d="M14 28 l6-10 6 6 8-12 4 6 -12 16 -8-8 -4 2z" fill="#041A14" opacity="0.9"/>
+  <text x="56" y="29" font-family="Inter, system-ui, -apple-system" font-size="18" fill="#E9EEF5" font-weight="800">
+    SnapTraderNaija
+  </text>
+</svg>
