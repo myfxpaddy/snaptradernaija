@@ -7,10 +7,7 @@ const err = $("#err");
 function showErr(m){ err.textContent = m; err.classList.add("show"); }
 function clearErr(){ err.textContent=""; err.classList.remove("show"); }
 
-const actionCodeSettings = {
-  url: "https://myfxpaddy.github.io/snaptradernaija/login.html",
-  handleCodeInApp: false
-};
+const actionCodeSettings = { url: "https://myfxpaddy.github.io/snaptradernaija/login.html", handleCodeInApp: false };
 
 $("#loginForm").addEventListener("submit", async (e)=>{
   e.preventDefault(); clearErr();
@@ -19,7 +16,6 @@ $("#loginForm").addEventListener("submit", async (e)=>{
   try{
     const { user } = await auth.signInWithEmailAndPassword(email, pass);
     if(!user.emailVerified){
-      // resend verification automatically to help the user
       await user.sendEmailVerification(actionCodeSettings);
       showErr("Please verify your email. We just sent you a verification link.");
       return;
@@ -27,14 +23,8 @@ $("#loginForm").addEventListener("submit", async (e)=>{
     localStorage.setItem("stn_user", JSON.stringify({ email: user.email, at: Date.now() }));
     window.location.href = "./dashboard.html";
   }catch(ex){
-    if (ex && ex.code === "auth/user-not-found") {
-      showErr("No account with this email. Create one on the Sign up page.");
-      return;
-    }
-    if (ex && ex.code === "auth/wrong-password") {
-      showErr("Wrong password. Try again or reset your password.");
-      return;
-    }
+    if (ex && ex.code === "auth/user-not-found") return showErr("No account with this email. Create one on the Sign up page.");
+    if (ex && ex.code === "auth/wrong-password") return showErr("Wrong password. Try again or reset your password.");
     showErr(ex.message || "Login failed.");
   }
 });

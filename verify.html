@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Verify your email — SnapTraderNaija</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth-pages.css"/>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="./"><img src="logo.svg" alt="SnapTraderNaija"/><b>SnapTraderNaija</b></a>
+    <span class="spacer"></span>
+    <a class="btn ghost" href="./login.html">Log in</a>
+    <a class="btn solid" href="./signup.html">Sign up</a>
+  </header>
+
+  <main class="main">
+    <section class="card">
+      <h1>Check your email</h1>
+      <p class="muted">We’ve sent a verification link to <b id="em"></b>. Click the link to activate your account.</p>
+      <div class="actions">
+        <button id="resend" class="ghost">Resend email</button>
+        <a class="btn primary" id="goLogin" href="./login.html">Go to login</a>
+      </div>
+      <p id="msg" class="helper" style="margin-top:10px;"></p>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> SnapTraderNaija</footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    const app = firebase.initializeApp(window.FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const params = new URLSearchParams(location.search);
+    const email = params.get("email") || "";
+    document.getElementById("em").textContent = email;
+
+    document.getElementById("resend").addEventListener("click", async ()=>{
+      try{
+        const u = auth.currentUser;
+        if(u){ await u.sendEmailVerification({ url:"https://myfxpaddy.github.io/snaptradernaija/login.html", handleCodeInApp:false }); }
+        document.getElementById("msg").textContent = "Verification email sent again. Check inbox/spam.";
+      }catch(e){ document.getElementById("msg").textContent = e.message || "Could not resend."; }
+    });
+  </script>
+</body>
+</html>

@@ -10,8 +10,7 @@ function clearErr(){ err.textContent=""; err.classList.remove("show"); }
 
 const actionCodeSettings = {
   url: "https://myfxpaddy.github.io/snaptradernaija/login.html",
-  handleCodeInApp: false, // open in browser, not inside app
-  // iOS/Android not used here, web only
+  handleCodeInApp: false
 };
 
 $("#signupForm").addEventListener("submit", async (e)=>{
@@ -42,44 +41,19 @@ $("#signupForm").addEventListener("submit", async (e)=>{
     const cred = await auth.createUserWithEmailAndPassword(profile.email, pass);
     const uid = cred.user.uid;
 
-    await db.collection("users").doc(uid).set({ createdAt: Date.now() }, { merge:true });
+    // Write ONLY to the allowed path: users/{uid}/profile/main
     await db.collection("users").doc(uid).collection("profile").doc("main").set(profile);
 
-    // Send verification email with explicit return URL
+    // Send verification email + redirect to verify page
     await cred.user.sendEmailVerification(actionCodeSettings);
-
-    const v = document.getElementById("verifyBlock");
-    if (v) v.style.display = "block";
-    alert("Verification email sent. Please check your inbox (and spam). After verifying, click ‘I’ve verified — refresh’.");
+    window.location.href = "./verify.html?email=" + encodeURIComponent(profile.email);
 
   }catch(ex){
-    // If the account already exists, guide the user
     if (ex && ex.code === "auth/email-already-in-use") {
-      showErr("This email is already registered. Try logging in — or reset your password if needed.");
+      // If user already exists, help them move forward
+      window.location.href = "./login.html?msg=already";
       return;
     }
     showErr(ex.message || "Signup failed.");
   }
-});
-
-document.getElementById("resendVerifyBtn").addEventListener("click", async ()=>{
-  try{
-    await firebase.auth().currentUser?.sendEmailVerification({
-      url: "https://myfxpaddy.github.io/snaptradernaija/login.html",
-      handleCodeInApp: false
-    });
-    alert("Verification email sent again.");
-  }catch(ex){ showErr(ex.message || "Could not resend."); }
-});
-
-document.getElementById("checkVerifiedBtn").addEventListener("click", async ()=>{
-  try{
-    await firebase.auth().currentUser?.reload();
-    if(firebase.auth().currentUser?.emailVerified){
-      localStorage.setItem("stn_user", JSON.stringify({ email: firebase.auth().currentUser.email, at: Date.now() }));
-      window.location.href = "./dashboard.html";
-    }else{
-      alert("Not verified yet — check your inbox.");
-    }
-  }catch(ex){ showErr(ex.message || "Could not refresh."); }
 });
