@@ -86,3 +86,14 @@ onAuthChange(u=>{
   if(!u){ location.href="./"; return; }
   loadAll();
 });
+
+
+/* Bigger dropzone behavior */
+(function(){
+  const drop = document.querySelector(".drop-visual");
+  const file = document.getElementById("file");
+  if(!drop || !file) return;
+  ["dragenter","dragover"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("drag-over"); }));
+  ["dragleave","drop"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
+  drop.addEventListener("drop", (e)=>{ const dt=e.dataTransfer; if(dt && dt.files && dt.files[0]){ file.files = dt.files; file.dispatchEvent(new Event("change")); }});
+})();

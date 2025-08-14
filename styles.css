@@ -207,3 +207,18 @@ button.ghost,.button.ghost{background:transparent;border:1px solid rgba(255,255,
 .footer { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:24px 18px; opacity:0.95; }
 .footer .footer-links a{ color:#cfe6ff; text-decoration:none; opacity:0.9; }
 .footer .footer-links a:hover{ opacity:1; }
+
+/* ===== Neon dropzone on Dashboard ===== */
+.drop-hero{ position:relative; overflow:hidden; border-radius:22px; }
+.drop-visual{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:48px 20px; min-height:280px; background:#0c1218; border:1px dashed rgba(255,255,255,0.09); }
+.drop-visual .icon{ font-size:46px; line-height:1; }
+.drop-visual h2{ margin:8px 0 0; font-size:26px; color:#eaf3ff; text-align:center; }
+.drop-visual .row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
+.drop-hero .glow{ position:absolute; filter: blur(60px); opacity:.45; }
+.drop-hero .glow.a{ width:220px; height:220px; background:#10b981; top:-40px; left:10%; animation: drift 12s linear infinite alternate; }
+.drop-hero .glow.b{ width:260px; height:260px; background:#22d3ee; bottom:-60px; right:12%; animation: drift 10s linear infinite alternate-reverse; }
+.drop-hero .glow.c{ width:200px; height:200px; background:#a78bfa; top:40%; left:50%; transform:translateX(-50%); animation: drift 14s linear infinite; }
+.drop-hero .dashed{ position:absolute; inset:20px; border:2px dashed rgba(255,255,255,0.12); border-radius:18px; pointer-events:none; }
+@keyframes drift{ to{ transform:translate(20px, -10px); } }
+.drop-visual.drag-over{ background:#0a1015; }
+.drop-visual.drag-over .dashed{ border-color: rgba(16,185,129,.55); }
