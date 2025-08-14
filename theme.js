@@ -1,14 +1,14 @@
 (function(){
   const root = document.documentElement;
-  const key = "stn-theme";
-  function apply(t){ root.setAttribute("data-theme", t); }
-  function current(){ return root.getAttribute("data-theme") || "dark"; }
-  const saved = localStorage.getItem(key);
-  if(saved) apply(saved); else apply(current());
-  document.querySelectorAll(".themeToggle").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const t = current()==="dark" ? "light" : "dark";
-      apply(t); localStorage.setItem(key, t);
+  const KEY = 'stn-theme';
+  const saved = localStorage.getItem(KEY);
+  if(saved){ root.setAttribute('data-theme', saved); }
+  document.querySelectorAll('.themeToggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cur = root.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem(KEY, next);
     });
   });
 })();
