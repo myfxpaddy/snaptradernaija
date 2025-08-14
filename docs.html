@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Docs — SnapTraderNaija</title>
+<link rel="stylesheet" href="styles.css"/></head><body>
+<nav class="nav"><div class="nav-inner shell"><a class="brand-inline" href="./"><img src="logo.svg" class="logo"/><span class="brand-name">SnapTraderNaija</span></a></div></nav>
+<main class="shell">
+<section class="card"><h1>API Contract</h1>
+<pre class="code">
+POST /analyze  (multipart/form-data: file=&lt;image/png|jpeg&gt;)
+Response 200:
+{
+  "direction": "BUY" | "SELL" | "UNCLEAR",
+  "score": 1..100,
+  "entry": 2420.0,
+  "tp": 2425.5,
+  "sl": 2416.2,
+  "pipSize": 0.10,
+  "pipsToTP": 55.0,
+  "pipsToSL": 38.0,
+  "rr": 1.45,
+  "notes": ["..."],
+  "evidence": [{"label":"Trend","value":"..."}]
+}
+</pre>
+<p>Front end lives on GitHub Pages. API can run on Fly.io free tier. CORS must allow the Pages origin.</p>
+</section>
+</main>
+<footer class="shell footer"><a href="./">← Home</a></footer>
+</body></html>
