@@ -52,7 +52,8 @@
     <h2>Upload or drag a chart screenshot</h2>
     <p class="muted">PNG or JPG — up to 10MB</p>
     <div class="row">
-      <button type="button" class="btn solid" id="browseBtn">Browse image</button>
+      <input type="file" id="file" accept="image/png,image/jpeg" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;" />
+      <label for="file" class="btn solid" id="browseBtn">Browse image</label>
       <span class="helper">or drag & drop</span>
     </div>
   </div>

@@ -130,3 +130,17 @@ onAuthChange(u=>{
   // Prevent the browser from opening the image when dropped anywhere else
   ["dragover","drop"].forEach(ev=> document.addEventListener(ev, e=>{ e.preventDefault(); }));
 })();
+
+
+/* --- Uploader UX: clickable (label-for) + global DnD prevent --- */
+(function(){
+  const drop = document.getElementById("dropVisual");
+  const file = document.getElementById("file");
+  if (drop){
+    ["dragenter","dragover"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("drag-over"); }));
+    ["dragleave","drop"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
+    drop.addEventListener("drop",(e)=>{ e.preventDefault(); const dt=e.dataTransfer; if(dt&&dt.files&&dt.files[0]){ file.files=dt.files; file.dispatchEvent(new Event("change",{bubbles:true})); }});
+  }
+  // Prevent open-in-new-tab when dropping anywhere on the page
+  ["dragover","drop"].forEach(ev=> window.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, true));
+})();
