@@ -1,57 +1,77 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <title>Dashboard · SnapTraderNaija</title>
-  <link rel="icon" href="favicon.svg" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-  <!-- Header identical structure / classes as home -->
-  <header class="site-header">
-    <div class="nav-wrap">
-      <a href="index.html" class="brand">
-        <img class="brand-mark" src="favicon.svg" alt="" />
+  <!-- SAME ANIMATED BACKGROUND AS HOMEPAGE -->
+  <div class="bg">
+    <div class="grid-lines"></div>
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="glow g3"></div>
+  </div>
+
+  <!-- SAME NAV AS HOMEPAGE -->
+  <nav class="nav">
+    <div class="nav-inner shell">
+      <a class="brand-inline" href="./" aria-label="SnapTraderNaija">
+        <img src="logo.svg" alt="" class="logo"/>
         <span class="brand-name">SnapTraderNaija</span>
       </a>
 
-      <nav class="nav">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+
+      <div class="nav-links" id="navLinks">
         <a href="index.html#features">Features</a>
         <a href="index.html#how">How it works</a>
-        <a href="index.html#try">Try it</a>
+        <a href="index.html#tool">Try it</a>
         <a href="docs.html">Docs</a>
         <a href="about.html">About</a>
-      </nav>
-
-      <div class="nav-actions">
-        <button class="themeToggle ghost" title="Toggle theme">🌗</button>
-        <a id="loginLink" class="ghost" href="auth.html#login">Log in</a>
-        <a id="signupLink" class="pill" href="auth.html#signup">Sign up</a>
-        <button id="logoutBtn" class="ghost">Logout</button>
+        <div class="nav-actions">
+          <button class="themeToggle" type="button" title="Toggle theme">🌗</button>
+          <a class="ghost small" href="login.html">Log in</a>
+          <a class="small" href="signup.html">Sign up</a>
+          <button class="ghost small logoutBtn only-logged-in hidden" type="button">Logout</button>
+        </div>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <main class="page">
-    <section class="hero-pad"></section>
+  <!-- PAGE CONTENT IN THE SAME SHELL LAYOUT -->
+  <main class="shell" style="padding-top:24px;">
+    <h1 class="section-title" style="margin-bottom:4px;">Dashboard</h1>
+    <p class="muted" style="margin-bottom:16px;">Overview of your analyses and performance.</p>
 
-    <section>
-      <h1 class="h2">Dashboard</h1>
-      <p class="muted">Overview of your analyses and performance.</p>
+    <!-- STATS CARDS (use same .card style as home) -->
+    <section class="grid" style="grid-template-columns:repeat(4,minmax(220px,1fr)); gap:14px; margin-bottom:16px;">
+      <article class="card stat">
+        <div class="label">Total Signals</div>
+        <div class="value" id="statTotal">—</div>
+      </article>
+      <article class="card stat">
+        <div class="label">Win Rate</div>
+        <div class="value" id="statWinRate">—</div>
+      </article>
+      <article class="card stat">
+        <div class="label">Total Pips</div>
+        <div class="value" id="statPips">—</div>
+      </article>
+      <article class="card stat">
+        <div class="label">Best Instrument</div>
+        <div class="value" id="statBest">—</div>
+      </article>
     </section>
 
-    <!-- Stats -->
-    <section class="grid-4 stats">
-      <div class="card stat"><div class="label">Total Signals</div><div class="val" id="statTotal">—</div></div>
-      <div class="card stat"><div class="label">Win Rate</div><div class="val" id="statWinRate">—</div></div>
-      <div class="card stat"><div class="label">Total Pips</div><div class="val" id="statPips">—</div></div>
-      <div class="card stat"><div class="label">Best Instrument</div><div class="val" id="statBest">—</div></div>
-    </section>
-
-    <!-- Live carousels (Crypto + Forex) -->
-    <section class="card section-pad" id="liveCarousels">
-      <h3 class="section-title">Live Crypto</h3>
+    <!-- LIVE TICKERS (CAROUSELS) -->
+    <section class="card" style="margin-bottom:16px;">
+      <h3 class="section-title" style="margin-bottom:8px;">Live Crypto</h3>
       <div class="carousel-wrap">
         <button class="car-btn left" data-target="crypto" aria-label="Prev">‹</button>
         <div class="carousel" data-carousel="crypto">
@@ -66,7 +86,7 @@
         <div class="edge-mask left"></div><div class="edge-mask right"></div>
       </div>
 
-      <h3 class="section-title mt-2">Forex (majors)</h3>
+      <h3 class="section-title" style="margin:18px 0 8px;">Forex (majors)</h3>
       <div class="carousel-wrap">
         <button class="car-btn left" data-target="forex" aria-label="Prev">‹</button>
         <div class="carousel" data-carousel="forex">
@@ -82,42 +102,54 @@
         <div class="edge-mask left"></div><div class="edge-mask right"></div>
       </div>
 
-      <p class="muted tiny mt-1">Crypto via Binance WS. FX via FreeForexAPI (fallback: ExchangeRate.Host) every ~5s.</p>
+      <p class="muted tiny" style="margin-top:8px;">Crypto via Binance WS. FX via FreeForexAPI (fallback: ExchangeRate.Host) every ~5s.</p>
     </section>
 
-    <!-- Upload -->
-    <section class="card section-pad">
-      <div id="dropVisual" class="drop-visual">
-        <div class="dashed"></div>
-        <div class="icon">⬆</div>
-        <h2>Upload or drag a chart screenshot</h2>
-        <p class="muted">PNG or JPG — up to 10MB</p>
-        <input id="file" type="file" accept="image/png,image/jpeg" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;" />
-        <label for="file" class="pill">Browse image</label>
-        <span class="helper">or drag & drop</span>
+    <!-- UPLOAD -->
+    <section class="card" style="margin-bottom:16px;">
+      <label class="uploader glass drop fancy" for="file" id="dropArea" style="display:block;">
+        <input id="file" type="file" accept="image/png,image/jpeg"/>
+        <div class="drop-graphic"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div></div>
+        <span class="drop-text"><b>Upload</b> or drag a chart screenshot<br/><small>PNG or JPG — up to 10MB</small></span>
+        <img class="preview hidden" id="preview" alt="preview"/>
+      </label>
+      <div class="actions">
+        <button type="button" id="analyzeBtn" class="button">Analyze</button>
+        <a class="ghost button" href="index.html#tool">Use the home tool</a>
+        <button type="button" id="clearBtn" class="ghost button">Clear</button>
       </div>
+      <div id="progress" class="progress hidden"><div class="bar" id="bar"></div><span id="progressText">Uploading…</span></div>
+      <p id="error" class="error hidden"></p>
     </section>
 
-    <!-- Table -->
-    <section class="card section-pad">
-      <div class="flex between">
+    <!-- ANALYSES TABLE -->
+    <section class="card">
+      <div class="grid" style="grid-template-columns:auto auto; align-items:center;">
         <h3>Your Analyses</h3>
-        <div class="actions">
-          <a class="ghost" href="index.html">Upload another</a>
-          <button class="ghost" id="refreshAnalyses">Refresh</button>
+        <div style="justify-self:end;">
+          <a class="ghost button" href="index.html">Upload another</a>
+          <button class="ghost button" id="refreshAnalyses">Refresh</button>
         </div>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap" style="margin-top:10px;">
         <table>
-          <thead><tr><th>Date</th><th>Symbol</th><th>Dir</th><th>Score</th><th>Entry</th><th>TP</th><th>SL</th><th>R:R</th><th>Status</th><th>Δ pips</th></tr></thead>
+          <thead>
+            <tr><th>Date</th><th>Symbol</th><th>Dir</th><th>Score</th><th>Entry</th><th>TP</th><th>SL</th><th>R:R</th><th>Status</th><th>Δ pips</th></tr>
+          </thead>
           <tbody id="rowsAnalyses"><tr><td colspan="10" style="text-align:center; opacity:.7;">No analyses yet.</td></tr></tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <script type="module" src="theme.js"></script>
+  <!-- SCRIPTS -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="dashboard.js"></script>
+  <script type="module" src="theme.js"></script>
 </body>
 </html>
+
