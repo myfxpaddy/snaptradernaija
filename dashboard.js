@@ -414,3 +414,29 @@ onAuthChange(u=>{
   autoScrollCarousel('.carousel[data-carousel="forex"]');
 
 })();
+
+
+/* ===== Carousel controls (buttons + drag/swipe) ===== */
+(function(){
+  function byData(name){ return document.querySelector(`.carousel[data-carousel="${name}"]`); }
+  function scrollByOne(root, dir){
+    if(!root) return;
+    const w = root.getBoundingClientRect().width * 0.9;
+    root.scrollTo({ left: root.scrollLeft + (dir>0? w : -w), behavior:'smooth' });
+  }
+  document.querySelectorAll('.car-btn.left').forEach(btn=>{
+    btn.addEventListener('click', ()=> scrollByOne(byData(btn.dataset.target), -1));
+  });
+  document.querySelectorAll('.car-btn.right').forEach(btn=>{
+    btn.addEventListener('click', ()=> scrollByOne(byData(btn.dataset.target), +1));
+  });
+
+  // drag/swipe
+  document.querySelectorAll('.carousel').forEach(car=>{
+    let isDown=false, startX=0, sl=0;
+    car.addEventListener('pointerdown',e=>{ isDown=true; startX=e.clientX; sl=car.scrollLeft; car.setPointerCapture(e.pointerId); });
+    car.addEventListener('pointermove',e=>{ if(!isDown) return; car.scrollLeft = sl - (e.clientX - startX); });
+    car.addEventListener('pointerup',()=>{ isDown=false; });
+    car.addEventListener('pointercancel',()=>{ isDown=false; });
+  });
+})();

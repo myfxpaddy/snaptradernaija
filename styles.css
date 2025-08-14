@@ -274,3 +274,37 @@ body{ background:var(--page-bg); color:var(--text); }
 /* make tiles pop */
 .card.tile{ background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,.25); }
 .card.tile:hover{ transform: translateY(-2px); transition: transform .15s ease; }
+
+/* ===== Ticker Carousels (arrowed) ===== */
+.carousel-group { position: relative; }
+.carousel-wrap { position:relative; }
+.carousel { display:grid; grid-auto-flow:column; grid-auto-columns: clamp(230px, 32vw, 320px);
+  gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; padding:12px 6px; }
+.carousel:active { cursor:grabbing }
+.carousel > .tile { scroll-snap-align:center; }
+
+.car-btn { position:absolute; top:50%; transform:translateY(-50%); z-index:3;
+  width:36px; height:36px; border-radius:999px; border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.35); color:#fff; font-size:22px; line-height:32px; text-align:center; cursor:pointer; }
+.car-btn.left { left:6px; } .car-btn.right{ right:6px; }
+.car-btn:hover{ background:rgba(0,0,0,.55) }
+
+.edge-mask { position:absolute; top:0; bottom:0; width:36px; z-index:2; pointer-events:none; }
+.edge-mask.left{ left:0; background:linear-gradient(90deg, rgba(11,16,22,1), rgba(11,16,22,0)); }
+.edge-mask.right{ right:0; background:linear-gradient(270deg, rgba(11,16,22,1), rgba(11,16,22,0)); }
+[data-theme="light"] .edge-mask.left{ background:linear-gradient(90deg, rgba(247,250,252,1), rgba(247,250,252,0)); }
+[data-theme="light"] .edge-mask.right{ background:linear-gradient(270deg, rgba(247,250,252,1), rgba(247,250,252,0)); }
+
+/* Card look */
+.card.tile{ background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:18px 16px; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+.tile-body{ display:flex; flex-direction:column; gap:6px; }
+.tile .sy{ font-weight:900; letter-spacing:.3px; font-size:18px; }
+.tile .px{ font-variant-numeric: tabular-nums; font-size:24px; font-weight:900; }
+.tile .sub{ opacity:.7; font-size:12px; }
+
+/* Tick coloring + flash */
+.ticker.up   .px{ color:#22c55e; }
+.ticker.down .px{ color:#ef4444; }
+.tick-blip { animation: tickflash .35s ease; }
+@keyframes tickflash { from{ text-shadow:0 0 16px rgba(255,255,255,.8) } to{ text-shadow:none } }
