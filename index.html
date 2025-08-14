@@ -177,20 +177,61 @@
   </footer>
 
   <!-- AUTH MODAL -->
+  
+  <!-- AUTH MODAL (branded) -->
   <dialog id="authModal" class="modal">
     <form method="dialog" class="modal-card" id="authForm">
-      <h3 id="authTitle">Log in</h3>
-      <p class="muted tight">Use your email & password. Forgot? <a href="#" id="forgotLink">Reset here</a>.</p>
-      <label>Email <input type="email" id="authEmail" required></label>
-      <label>Password <input type="password" id="authPass" required></label>
-      <div class="actions"><button id="authSubmitBtn">Continue</button><button class="ghost" id="authCancelBtn">Cancel</button></div>
-      <p class="muted xs">By continuing you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy</a>.</p>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <img src="logo.svg" alt="SnapTraderNaija" style="height:26px;width:auto"/>
+        <h3 id="authTitle" style="margin:0;">Sign up</h3>
+      </div>
+
+      <p id="authMsg" class="muted tight">Create an account to view results and keep your dashboard in sync.</p>
+      <p id="authErr" class="error hidden"></p>
+
+      <!-- Signup-only fields -->
+      <div id="signupFields">
+        <label>Full name
+          <input type="text" id="fullName" autocomplete="name">
+        </label>
+        <label>Country
+          <input type="text" id="country" autocomplete="country-name" placeholder="e.g. Nigeria">
+        </label>
+        <label style="display:flex;gap:8px;align-items:center;margin:10px 0;">
+          <input type="checkbox" id="agree" style="width:auto">
+          <span>I agree to the <a href="terms.html" target="_blank">Terms</a> and <a href="privacy.html" target="_blank">Privacy</a>.</span>
+        </label>
+      </div>
+
+      <!-- Always-visible fields -->
+      <label>Email <input type="email" id="authEmail" required autocomplete="email"></label>
+      <label>Password <input type="password" id="authPass" required autocomplete="current-password"></label>
+
+      <div class="actions">
+        <button id="authSubmitBtn">Continue</button>
+        <button class="ghost" id="authCancelBtn">Cancel</button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <a href="#" id="switchMode">Already have an account? Log in</a>
+        <a href="#" id="forgotLink">Reset password</a>
+      </div>
+
+      <div id="verifyBlock" class="hidden" style="margin-top:10px;">
+        <p class="muted">We sent a verification email. Please verify your address, then click below.</p>
+        <div class="actions">
+          <button id="checkVerifiedBtn" class="ghost">I’ve verified — refresh</button>
+          <button id="resendVerifyBtn" class="ghost">Resend email</button>
+        </div>
+      </div>
     </form>
   </dialog>
+
 
   <!-- Firebase + scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebaseConfig.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="app.js"></script>
