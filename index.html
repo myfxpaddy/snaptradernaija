@@ -26,7 +26,7 @@
         <img src="logo.svg" alt="SnapTraderNaija" class="logo"/>
         <span class="brand-name">SnapTraderNaija</span>
       </a>
-      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></a>
       <div class="nav-links" id="navLinks">
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
@@ -35,9 +35,9 @@
         <a href="about.html">About</a>
         <a href="dashboard.html" id="dashLink" class="hidden">Dashboard</a>
         <div class="nav-actions">
-          <button id="loginOpenBtn" class="ghost small only-logged-out">Log in</button>
-          <button id="signupOpenBtn" class="small only-logged-out">Sign up</button>
-          <button class="ghost small logoutBtn only-logged-in hidden">Logout</button>
+          <a id="loginOpenBtn" class="ghost small" href="login.html" class="ghost small only-logged-out">Log in</a>
+          <a id="signupOpenBtn" class="small" href="signup.html" class="small only-logged-out">Sign up</a>
+          <button class="ghost small logoutBtn only-logged-in hidden">Logout</a>
         </div>
       </div>
     </div>
@@ -122,9 +122,9 @@
           <img class="preview hidden" id="preview" alt="preview"/>
         </label>
         <div class="actions">
-          <button type="submit" id="analyzeBtn">Analyze</button>
-          <button type="button" id="demoBtn" class="ghost">Demo Result</button>
-          <button type="button" id="clearBtn" class="ghost">Clear</button>
+          <button type="submit" id="analyzeBtn">Analyze</a>
+          <button type="button" id="demoBtn" class="ghost">Demo Result</a>
+          <button type="button" id="clearBtn" class="ghost">Clear</a>
         </div>
         <div id="progress" class="progress hidden"><div class="bar" id="bar"></div><span id="progressText">Uploading…</span></div>
         <p id="error" class="error hidden"></p>
@@ -145,7 +145,7 @@
       </div>
       <div class="notes"><h3>Notes</h3><ul id="notes"></ul></div>
       <div class="notes"><h3>Evidence</h3><ul id="evidence"></ul></div>
-      <div class="gate hidden" id="gate"><div class="gate-inner"><h3>Login required</h3><p class="muted">Upload is open. To reveal the result, please log in or sign up.</p><div class="gate-actions"><button id="gateLoginBtn">Log in</button><button class="ghost" id="gateSignupBtn">Sign up</button></div></div></div>
+      <div class="gate hidden" id="gate"><div class="gate-inner"><h3>Login required</h3><p class="muted">Upload is open. To reveal the result, please log in or sign up.</p><div class="gate-actions"><button id="gateLoginBtn">Log in</a><button class="ghost" id="gateSignupBtn">Sign up</a></div></div></div>
     </section>
 
     <section class="cta card">
@@ -183,80 +183,7 @@
   <!-- AUTH MODAL (branded, full profile) -->
   
   <!-- AUTH MODAL (branded, full profile) -->
-  <dialog id="authModal" class="modal">
-    <form method="dialog" class="modal-card" id="authForm">
-      <div class="modal-header">
-        <img src="logo.svg" alt="SnapTraderNaija" class="modal-logo"/>
-        <h3 id="authTitle">Sign up</h3>
-      </div>
-
-      <p id="authMsg" class="muted tight">Create an account to view results and keep your dashboard in sync.</p>
-      <p id="authErr" class="error hidden"></p>
-
-      <!-- Signup-only fields -->
-      <div id="signupFields" class="grid2">
-        <label>Full name
-          <input type="text" id="fullName" autocomplete="name" required>
-        </label>
-        <label>Country
-          <input type="text" id="country" autocomplete="country-name" placeholder="e.g. Nigeria" required>
-        </label>
-        <label>Phone number
-          <input type="tel" id="phone" placeholder="+2348012345678">
-        </label>
-        <label>Gender
-          <select id="gender">
-            <option value="">Prefer not to say</option>
-            <option>Female</option>
-            <option>Male</option>
-            <option>Non-binary</option>
-            <option>Other</option>
-          </select>
-        </label>
-        <label class="full">Address
-          <textarea id="address" rows="2" placeholder="Street, city, state/region, postal code"></textarea>
-        </label>
-        <label class="full">Telegram handle
-          <input type="text" id="telegram" placeholder="@yourhandle">
-        </label>
-
-        <label class="check full">
-          <input type="checkbox" id="isAdult" required>
-          <span>I confirm I am 18+ and of legal age to trade CFDs/derivatives in my jurisdiction.</span>
-        </label>
-        <label class="check full">
-          <input type="checkbox" id="agree" required>
-          <span>I accept the <a href="terms.html" target="_blank">Terms</a> and <a href="privacy.html" target="_blank">Privacy</a>.</span>
-        </label>
-      </div>
-
-      <!-- Always-visible fields -->
-      <label>Email
-        <input type="email" id="authEmail" required autocomplete="email">
-      </label>
-      <label>Password
-        <input type="password" id="authPass" required autocomplete="current-password" minlength="6">
-      </label>
-
-      <div class="actions">
-        <button id="authSubmitBtn">Continue</button>
-        <button class="ghost" id="authCancelBtn">Cancel</button>
-      </div>
-
-      <div class="row-links">
-        <a href="#" id="switchMode">Already have an account? Log in</a>
-        <a href="#" id="forgotLink">Reset password</a>
-      </div>
-
-      <div id="verifyBlock" class="hidden verify">
-        <p class="muted">We sent a verification email. Please verify your address, then click below.</p>
-        <div class="actions">
-          <button id="checkVerifiedBtn" class="ghost">I’ve verified — refresh</button>
-          <button id="resendVerifyBtn" class="ghost">Resend email</button>
-        </div>
-      </div>
-    </form>
-  </dialog>
+  
 
 
 

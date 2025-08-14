@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Log in — SnapTraderNaija</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth-pages.css"/>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="./">
+      <img src="logo.svg" alt="SnapTraderNaija"/>
+      <b>SnapTraderNaija</b>
+    </a>
+    <span class="spacer"></span>
+    <a class="btn ghost" href="./login.html">Log in</a>
+    <a class="btn solid" href="./signup.html">Sign up</a>
+  </header>
+
+  <main class="main">
+    <section class="card">
+      <h1>Log in</h1>
+      <p class="muted">Welcome back. Please use your email and password.</p>
+
+      <p id="err" class="error"></p>
+
+      <form id="loginForm" class="form-grid" novalidate>
+        <label class="full">Email
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+        <label class="full">Password
+          <input id="password" type="password" autocomplete="current-password" required>
+        </label>
+
+        <div class="actions full">
+          <button class="primary" type="submit">Log in</button>
+          <a class="btn ghost" id="resetBtn" href="#">Reset password</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> SnapTraderNaija</footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script type="module" src="login.js"></script>
+  <script>document.getElementById("year").textContent = new Date().getFullYear()</script>
+</body>
+</html>

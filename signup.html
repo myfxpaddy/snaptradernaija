@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign up — SnapTraderNaija</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth-pages.css"/>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="./">
+      <img src="logo.svg" alt="SnapTraderNaija"/>
+      <b>SnapTraderNaija</b>
+    </a>
+    <span class="spacer"></span>
+    <a class="btn ghost" href="./login.html">Log in</a>
+    <a class="btn solid" href="./signup.html">Sign up</a>
+  </header>
+
+  <main class="main">
+    <section class="card">
+      <h1>Sign up</h1>
+      <p class="muted">Create an account to view results and keep your dashboard in sync.</p>
+
+      <p id="err" class="error"></p>
+
+      <form id="signupForm" class="form-grid" novalidate>
+        <label>Full name
+          <input id="fullName" autocomplete="name" required>
+        </label>
+        <label>Country
+          <input id="country" autocomplete="country-name" placeholder="e.g. Nigeria" required>
+        </label>
+
+        <label>Phone number
+          <input id="phone" type="tel" placeholder="+2348012345678">
+        </label>
+        <label>Gender
+          <select id="gender">
+            <option value="">Prefer not to say</option>
+            <option>Female</option><option>Male</option><option>Non-binary</option><option>Other</option>
+          </select>
+        </label>
+
+        <label class="full">Address
+          <textarea id="address" rows="2" placeholder="Street, city, state/region, postal code"></textarea>
+        </label>
+
+        <label class="full">Telegram handle
+          <input id="telegram" placeholder="@yourhandle">
+        </label>
+
+        <label class="check full">
+          <input type="checkbox" id="isAdult" required>
+          <span>I confirm I am 18+ and of legal age to trade CFDs/derivatives in my jurisdiction.</span>
+        </label>
+
+        <label class="check full">
+          <input type="checkbox" id="agree" required>
+          <span>I accept the <a href="terms.html" target="_blank">Terms</a> and <a href="privacy.html" target="_blank">Privacy</a>.</span>
+        </label>
+
+        <label class="full">Email
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+        <label class="full">Password
+          <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+        </label>
+
+        <div class="actions full">
+          <button class="primary" type="submit">Create account</button>
+          <a class="btn ghost" href="./login.html">I already have an account</a>
+        </div>
+
+        <div id="verifyBlock" class="full" style="display:none">
+          <p class="helper">We sent a verification email. Please verify, then click below.</p>
+          <div class="row">
+            <button id="checkVerifiedBtn" class="ghost" type="button">I’ve verified — refresh</button>
+            <button id="resendVerifyBtn" class="ghost" type="button">Resend email</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <p class="note">Not financial advice. Educational use only — a fun way to blend AI and trading.</p>
+  </main>
+
+  <footer>© <span id="year"></span> SnapTraderNaija</footer>
+
+  <!-- Firebase + app scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script type="module" src="signup.js"></script>
+  <script>document.getElementById("year").textContent = new Date().getFullYear()</script>
+</body>
+</html>
