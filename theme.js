@@ -1,12 +1,14 @@
 (function(){
-  const KEY="stn_theme";
   const root = document.documentElement;
-  const apply = t => root.setAttribute("data-theme", t);
-  apply(localStorage.getItem(KEY) || "dark");
+  const key = "stn-theme";
+  function apply(t){ root.setAttribute("data-theme", t); }
+  function current(){ return root.getAttribute("data-theme") || "dark"; }
+  const saved = localStorage.getItem(key);
+  if(saved) apply(saved); else apply(current());
   document.querySelectorAll(".themeToggle").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      const next = root.getAttribute("data-theme")==="dark" ? "light" : "dark";
-      apply(next); localStorage.setItem(KEY,next);
+      const t = current()==="dark" ? "light" : "dark";
+      apply(t); localStorage.setItem(key, t);
     });
   });
 })();
