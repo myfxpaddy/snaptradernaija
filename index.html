@@ -20,28 +20,31 @@
   </div>
 
   <!-- NAV -->
+  
   <nav class="nav">
     <div class="nav-inner shell">
-      <a class="brand-inline" href="./">
+      <a class="brand-inline" href="./" aria-label="SnapTraderNaija">
         <img src="logo.svg" alt="SnapTraderNaija" class="logo"/>
         <span class="brand-name">SnapTraderNaija</span>
       </a>
-      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></a>
+
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+
       <div class="nav-links" id="navLinks">
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
         <a href="#tool">Try it</a>
         <a href="docs.html">Docs</a>
         <a href="about.html">About</a>
-        <a href="dashboard.html" id="dashLink" class="hidden">Dashboard</a>
         <div class="nav-actions">
-          <a id="loginOpenBtn" class="ghost small" href="login.html" class="ghost small only-logged-out">Log in</a>
-          <a id="signupOpenBtn" class="small" href="signup.html" class="small only-logged-out">Sign up</a>
-          <button class="ghost small logoutBtn only-logged-in hidden">Logout</a>
+          <a id="loginOpenBtn" class="ghost small" href="login.html">Log in</a>
+          <a id="signupOpenBtn" class="small" href="signup.html">Sign up</a>
+          <button class="ghost small logoutBtn only-logged-in hidden" type="button">Logout</button>
         </div>
       </div>
     </div>
   </nav>
+
 
   <!-- HERO -->
   <header class="hero shell">

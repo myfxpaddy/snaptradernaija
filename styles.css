@@ -177,3 +177,33 @@ button.ghost,.button.ghost{background:transparent;border:1px solid rgba(255,255,
 .modal-logo { height:24px; width:auto; filter: drop-shadow(0 0 6px rgba(0,255,200,0.25)); }
 .row-links { display:flex; justify-content:space-between; margin-top:8px; font-size: 0.95rem; }
 .verify { margin-top:12px; padding:10px; border:1px dashed #2a2f3a; border-radius:12px; }
+
+/* --- Header polish / ensure visibility --- */
+.nav { position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.2) blur(8px); border-bottom:1px solid rgba(255,255,255,0.06); }
+.nav-inner { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; }
+.brand-inline { display:flex; align-items:center; gap:10px; color:#eaf3ff; text-decoration:none; font-weight:800; letter-spacing:0.1px; }
+.brand-inline .logo { width:28px; height:28px; }
+.brand-name { font-size:18px; }
+.nav-links { display:flex; align-items:center; gap:16px; }
+.nav-links a { color:#cfe6ff; text-decoration:none; font-weight:600; opacity:0.9; }
+.nav-links a:hover { opacity:1; }
+.nav-actions { display:flex; gap:10px; margin-left:12px; }
+.nav-actions .small { padding:8px 12px; border-radius:999px; font-weight:700; }
+.nav-actions .ghost { background:transparent; color:#eaf3ff; border:1px solid rgba(255,255,255,0.18); }
+.nav-actions .small:not(.ghost) { background:#10b981; color:#07171a; }
+
+.hamburger{ display:none; background:transparent; border:0; }
+.hamburger span{ display:block; width:22px; height:2px; background:#cfe6ff; margin:5px 0; border-radius:2px; }
+
+/* Mobile nav */
+@media (max-width: 860px){
+  .hamburger{ display:block; }
+  .nav-links{ position:fixed; right:12px; top:62px; background:rgba(10,14,18,0.95); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:12px; flex-direction:column; gap:10px; display:none; }
+  .nav-links.open{ display:flex; }
+  .nav-links a{ color:#eaf3ff; }
+}
+
+/* --- Footer polish --- */
+.footer { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:24px 18px; opacity:0.95; }
+.footer .footer-links a{ color:#cfe6ff; text-decoration:none; opacity:0.9; }
+.footer .footer-links a:hover{ opacity:1; }
