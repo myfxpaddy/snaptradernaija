@@ -440,3 +440,120 @@ onAuthChange(u=>{
     car.addEventListener('pointercancel',()=>{ isDown=false; });
   });
 })();
+
+/* === CAROUSEL CONTROLS START === */
+
+(function(){
+  function byData(name){ return document.querySelector(`.carousel[data-carousel="${name}"]`); }
+  function scrollByOne(root, dir){
+    if(!root) return;
+    const w = root.getBoundingClientRect().width * 0.9;
+    root.scrollTo({ left: root.scrollLeft + (dir>0? w : -w), behavior:'smooth' });
+  }
+  document.querySelectorAll('.car-btn.left').forEach(btn=>{
+    btn.addEventListener('click', ()=> scrollByOne(byData(btn.dataset.target), -1));
+  });
+  document.querySelectorAll('.car-btn.right').forEach(btn=>{
+    btn.addEventListener('click', ()=> scrollByOne(byData(btn.dataset.target), +1));
+  });
+  // drag/swipe
+  document.querySelectorAll('.carousel').forEach(car=>{
+    let isDown=false, startX=0, sl=0;
+    car.addEventListener('pointerdown',e=>{ isDown=true; startX=e.clientX; sl=car.scrollLeft; car.setPointerCapture(e.pointerId); });
+    car.addEventListener('pointermove',e=>{ if(!isDown) return; car.scrollLeft = sl - (e.clientX - startX); });
+    car.addEventListener('pointerup',()=>{ isDown=false; });
+    car.addEventListener('pointercancel',()=>{ isDown=false; });
+  });
+})();
+
+/* === CAROUSEL CONTROLS END === */
+
+/* === LIVE CRYPTO START === */
+
+(function(){
+  const prev = { BTCUSD:null, ETHUSD:null };
+  function el(sym){ return document.querySelector(`[data-ticker="${sym}"]`); }
+  function render(sym, px){
+    const root = el(sym); if(!root) return;
+    const priceEl = root.querySelector('.price') || root.querySelector('.px') || (()=>{const d=document.createElement('div'); d.className='px price'; root.appendChild(d); return d;})();
+    const old = prev[sym];
+    root.classList.remove('up','down');
+    if(old!=null){ if(px>old) root.classList.add('up'); else if(px<old) root.classList.add('down'); }
+    priceEl.textContent = Number(px).toLocaleString(undefined,{maximumFractionDigits:2});
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 220);
+    prev[sym]=px;
+  }
+  function openWS(){
+    try{
+      const ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@trade/ethusdt@trade');
+      ws.onmessage = (evt)=>{ const d=JSON.parse(evt.data); const s=d?.data?.s; const p=parseFloat(d?.data?.p);
+        if(!s || !Number.isFinite(p)) return;
+        render(s==='BTCUSDT'?'BTCUSD':'ETHUSDT'===s?'ETHUSD':null, p);
+      };
+      ws.onclose = ()=> setTimeout(openWS, 1500);
+      ws.onerror = ()=> { try{ ws.close(); }catch(_){} };
+    }catch(e){ setTimeout(openWS, 2500); }
+  }
+  openWS();
+})();
+
+/* === LIVE CRYPTO END === */
+
+/* === LIVE FOREX START === */
+
+(function(){
+  const majors = ['EURUSD','GBPUSD','USDJPY','USDCHF','AUDUSD','USDCAD','NZDUSD'];
+  const prev = Object.fromEntries(majors.map(m=>[m,null]));
+  function el(sym){ return document.querySelector(`[data-ticker="${sym}"]`); }
+  function render(sym, px){
+    const root = el(sym); if(!root) return;
+    const priceEl = root.querySelector('.price') || root.querySelector('.px') || (()=>{const d=document.createElement('div'); d.className='px price'; root.appendChild(d); return d;})();
+    const old = prev[sym];
+    root.classList.remove('up','down');
+    if(old!=null){ if(px>old) root.classList.add('up'); else if(px<old) root.classList.add('down'); }
+    priceEl.textContent = Number(px).toLocaleString(undefined,{maximumFractionDigits: sym.endsWith('JPY')?3:5});
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 200);
+    prev[sym]=px;
+  }
+  async function pollFreeForex(){
+    const r = await fetch(`https://www.freeforexapi.com/api/live?pairs=${majors.join(',')}`, {cache:'no-store'});
+    if(!r.ok) throw new Error('freeforex not ok');
+    const j = await r.json();
+    const rates = j?.rates || {};
+    majors.forEach(k=>{ const v = rates[k]?.rate; if(Number.isFinite(v)) render(k,v); });
+  }
+  async function pollERH(){
+    const bases = ['USD','EUR','GBP','AUD','NZD'];
+    const all = {};
+    for (const b of bases){
+      const r = await fetch(`https://api.exchangerate.host/latest?base=${b}`, {cache:'no-store'});
+      const j = await r.json(); if(j && j.rates) all[b]=j.rates;
+    }
+    const map = {
+      EURUSD: all.EUR?.USD, GBPUSD: all.GBP?.USD, USDJPY: all.USD?.JPY,
+      USDCHF: all.USD?.CHF, AUDUSD: all.AUD?.USD, USDCAD: all.USD?.CAD, NZDUSD: all.NZD?.USD
+    };
+    for (const [k,v] of Object.entries(map)){ if(Number.isFinite(v)) render(k,v); }
+  }
+  async function tick(){ try{ await pollFreeForex(); }catch(_){ try{ await pollERH(); }catch(__){} } }
+  tick(); setInterval(tick, 5000);
+})();
+
+/* === LIVE FOREX END === */
+
+/* === UPLOADER UX START === */
+
+(function(){
+  const drop = document.getElementById("dropVisual");
+  const file = document.getElementById("file");
+  // clicking anywhere (except buttons) opens picker
+  drop && drop.addEventListener("click", e=>{ if(e.target.closest("label,button,a")) return; file && file.click(); });
+  // drag styling & drop
+  ["dragenter","dragover"].forEach(ev=> drop && drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("drag-over"); }));
+  ["dragleave","drop"].forEach(ev=> drop && drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
+  drop && drop.addEventListener("drop", e=>{ const dt=e.dataTransfer; if(dt && dt.files && dt.files[0]){ file.files=dt.files; file.dispatchEvent(new Event("change",{bubbles:true})); }});
+  // prevent browser opening new tab
+  ["dragover","drop"].forEach(ev=> window.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, true));
+})();
+
+/* === UPLOADER UX END === */

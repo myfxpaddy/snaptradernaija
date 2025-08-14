@@ -1,125 +1,185 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Dashboard — SnapTraderNaija</title>
-<link rel="icon" href="favicon.svg" type="image/svg+xml"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard · SnapTraderNaija</title>
+  <link rel="icon" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="auth-pages.css" />
+  <style>
+    /* ======= Local tweaks for dashboard layout ======= */
+    .page { max-width: 1180px; margin: 0 auto; padding: 18px 16px 60px; }
+    .headerbar { display:flex; align-items:center; gap:14px; }
+    .brand-inline { display:flex; align-items:center; gap:10px; font-weight:900; font-size:18px; }
+    .brand-inline .logo { height: 22px; width: auto; }
+    .spacer { flex:1; }
+    .nav-actions { display:flex; gap:8px; align-items:center; }
+    .btn { border:1px solid var(--border); background:transparent; color:var(--text);
+           border-radius:999px; padding:8px 12px; font-weight:800; cursor:pointer; }
+    .btn.solid { background:#00e29b; color:#062017; border-color:transparent; }
+    .btn.small { padding:6px 10px; font-weight:800; }
+    .muted.small { font-size:12px; opacity:.75; }
+
+    /* Stats grid */
+    .stats { display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:14px; }
+    @media (max-width:980px){ .stats{ grid-template-columns:repeat(2,1fr);} }
+    @media (max-width:560px){ .stats{ grid-template-columns:1fr;} }
+    .stat-card { padding:16px; border-radius:16px; border:1px solid var(--border); background:var(--card-bg); }
+    .stat-card h4 { margin:0 0 4px 0; font-size:15px; opacity:.85; }
+    .stat-card .v { font-size:26px; font-weight:900; }
+
+    /* ===== Ticker Carousels (arrows + cards) ===== */
+    .section { margin-top:26px; }
+    .carousel-group { position: relative; }
+    .carousel-wrap { position:relative; }
+    .carousel { display:grid; grid-auto-flow:column; grid-auto-columns: clamp(300px, 36vw, 390px);
+      gap:18px; overflow-x:auto; scroll-snap-type:x mandatory; padding:16px 8px; }
+    .carousel > .tile { scroll-snap-align:center; }
+    .car-btn { position:absolute; top:50%; transform:translateY(-50%); z-index:3;
+      width:38px; height:38px; border-radius:999px; border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.35); color:#fff; font-size:24px; line-height:34px; text-align:center; cursor:pointer; }
+    .car-btn.left { left:4px; } .car-btn.right{ right:4px; }
+    .car-btn:hover{ background:rgba(0,0,0,.55) }
+    .edge-mask { position:absolute; top:0; bottom:0; width:44px; z-index:2; pointer-events:none; }
+    .edge-mask.left{ left:0; background:linear-gradient(90deg, var(--page-bg), rgba(0,0,0,0)); }
+    .edge-mask.right{ right:0; background:linear-gradient(270deg, var(--page-bg), rgba(0,0,0,0)); }
+
+    .card.tile{ background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.13); border-radius:20px; padding:26px 22px; box-shadow:0 12px 34px rgba(0,0,0,.28);
+      min-height:160px; display:flex; align-items:center; justify-content:center; }
+    .tile-body{ display:flex; gap:8px; align-items:center; justify-content:space-between; width:100%; }
+    .tile .sy{ font-weight:900; letter-spacing:.3px; font-size:22px; }
+    .tile .px{ font-variant-numeric: tabular-nums; font-size:30px; font-weight:900; }
+    .tile .sub{ opacity:.75; font-size:12px; }
+
+    .ticker.up   .px{ color:#22c55e; }
+    .ticker.down .px{ color:#ef4444; }
+    .tick-blip { animation: tickflash .35s ease; }
+    @keyframes tickflash { from{ text-shadow:0 0 18px rgba(255,255,255,.85) } to{ text-shadow:none } }
+
+    /* Upload hero */
+    .drop-hero { margin-top:28px; padding:22px; border-radius:18px; background:var(--card-bg); border:1px dashed var(--border); position:relative; }
+    .drop-visual{ position:relative; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; }
+    .drop-visual h2 { margin:8px 0 0 0; font-size:22px; font-weight:900; }
+    .drop-visual .muted { opacity:.8; }
+    .drop-visual .row { display:flex; align-items:center; gap:12px; margin-top:10px; }
+    .drop-hero .dashed{ position:absolute; inset:14px; border:2px dashed rgba(255,255,255,.13); border-radius:16px; pointer-events:none; }
+    .drop-visual .icon{ font-size:36px; opacity:.9; }
+    .drop-visual.drag-over .dashed{ border-color:#00e29b; box-shadow:0 0 40px rgba(0,226,155,.3) inset; }
+
+    /* Analyses table */
+    .panel { margin-top:26px; padding:18px; border-radius:16px; border:1px solid var(--border); background:var(--card-bg); }
+    table { width:100%; border-collapse:collapse; font-variant-numeric: tabular-nums; }
+    th, td { padding:10px 8px; border-bottom:1px solid var(--border); text-align:left; }
+    th { font-size:12px; letter-spacing:.04em; opacity:.8; }
+  </style>
 </head>
 <body>
-<div class="bg"><div class="grid-lines"></div><div class="glow g1"></div><div class="glow g2"></div></div>
+  <header class="page headerbar">
+    <a href="index.html" class="brand-inline">
+      <img src="favicon.svg" alt="" class="logo" />
+      <span class="brand-name">SnapTraderNaija</span>
+    </a>
+    <span class="spacer"></span>
+    <nav class="nav-actions">
+      <a class="btn small" href="index.html">Home</a>
+      <a class="btn small" href="docs.html">Docs</a>
+      <button class="themeToggle btn small" type="button" title="Toggle theme">🌗</button>
+      <button id="logoutBtn" class="btn small" type="button">Logout</button>
+    </nav>
+  </header>
 
-<nav class="nav">
-  <div class="nav-inner shell">
-    <a class="brand-inline" href="./"><img src="logo.svg" class="logo"/><span class="brand-name">SnapTraderNaija</span></a>
-    <div class="nav-links">
-      <a href="./">Home</a>
-      <a href="docs.html">Docs</a>
-      <button class="ghost small logoutBtn only-logged-in">Logout</button>
-    </div>
-  </div>
-</nav>
-
-<main class="shell">
-  <section class="section">
-    <h1>Dashboard</h1>
+  <main class="page">
+    <h2>Dashboard</h2>
     <p class="muted">Overview of your analyses and performance.</p>
-    <div class="sticky-grid">
-      <article class="sticky s1"><h3>Total Signals</h3><p id="k_total">—</p><span class="pin"></span></article>
-      <article class="sticky s2"><h3>Win Rate</h3><p id="k_winrate">—</p><span class="pin"></span></article>
-      <article class="sticky s3"><h3>Total Pips</h3><p id="k_pips">—</p><span class="pin"></span></article>
-      <article class="sticky s4"><h3>Best Instrument</h3><p id="k_best">—</p><span class="pin"></span></article>
-    </div>
-  </section>
 
-  <section class="section">
-    <h2>Live Tickers</h2>
-    <div class="feature-grid">
-      <div class="feature"><h3>BTCUSD</h3><p id="t_btc">—</p></div>
-      <div class="feature"><h3>ETHUSD</h3><p id="t_eth">—</p></div>
-      <div class="feature"><h3>SPX (S&P 500)</h3><p id="t_spx">—</p></div>
-      <div class="feature"><h3>XAUUSD</h3><p id="t_xau">—</p></div>
-    </div>
-  
-    
-      <div class="grid-2" data-forex-root>
-        <div class="ticker" data-ticker="EURUSD"><b>EURUSD</b> <span class="price">—</span></div>
-        <div class="ticker" data-ticker="GBPUSD"><b>GBPUSD</b> <span class="price">—</span></div>
-        <div class="ticker" data-ticker="USDJPY"><b>USDJPY</b> <span class="price">—</span></div>
-        <div class="ticker" data-ticker="USDCHF"><b>USDCHF</b> <span class="price">—</span></div>
-        <div class="ticker" data-ticker="AUDUSD"><b>AUDUSD</b> <span class="price">—</span></div>
-        <div class="ticker" data-ticker="USDCAD"><b>USDCAD</b> <span class="price">—</span></div>
-        <div class="ticker" data-ticker="NZDUSD"><b>NZDUSD</b> <span class="price">—</span></div>
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat-card"><h4>Total Signals</h4><div class="v" id="statTotal">—</div></div>
+      <div class="stat-card"><h4>Win Rate</h4><div class="v" id="statWinRate">—</div></div>
+      <div class="stat-card"><h4>Total Pips</h4><div class="v" id="statPips">—</div></div>
+      <div class="stat-card"><h4>Best Instrument</h4><div class="v" id="statBest">—</div></div>
+    </section>
+
+    <!-- Live carousels -->
+    <section class="section card" id="liveCarousels">
+      <div class="carousel-group">
+        <div class="card-head"><h3>Live Crypto</h3></div>
+        <div class="carousel-wrap">
+          <button class="car-btn left" data-target="crypto" aria-label="Prev">‹</button>
+          <div class="carousel" data-carousel="crypto">
+            <article class="card tile ticker" data-ticker="BTCUSD">
+              <div class="tile-body"><div class="sy">BTCUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
+            </article>
+            <article class="card tile ticker" data-ticker="ETHUSD">
+              <div class="tile-body"><div class="sy">ETHUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
+            </article>
+          </div>
+          <button class="car-btn right" data-target="crypto" aria-label="Next">›</button>
+          <div class="edge-mask left"></div><div class="edge-mask right"></div>
+        </div>
       </div>
-      <p class="muted" style="margin-top:10px;">FX feed via FreeForexAPI (5s refresh). Crypto via Binance WebSocket.</p>
-    </div>
-    
-<section class="card" id="liveCarousels">
-  <div class="card-head"><h3>Live Crypto</h3></div>
-  <div class="carousel" data-carousel="crypto">
-    <div class="card tile ticker" data-ticker="BTCUSD"><div class="sy">BTCUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
-    <div class="card tile ticker" data-ticker="ETHUSD"><div class="sy">ETHUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
-  </div>
 
-  <div class="card-head" style="margin-top:18px;"><h3>Forex (majors)</h3></div>
-  <div class="carousel" data-carousel="forex">
-    <div class="card tile ticker" data-ticker="EURUSD"><div class="sy">EURUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
-    <div class="card tile ticker" data-ticker="GBPUSD"><div class="sy">GBPUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
-    <div class="card tile ticker" data-ticker="USDJPY"><div class="sy">USDJPY</div><div class="px price">—</div><div class="sub">FX</div></div>
-    <div class="card tile ticker" data-ticker="USDCHF"><div class="sy">USDCHF</div><div class="px price">—</div><div class="sub">FX</div></div>
-    <div class="card tile ticker" data-ticker="AUDUSD"><div class="sy">AUDUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
-    <div class="card tile ticker" data-ticker="USDCAD"><div class="sy">USDCAD</div><div class="px price">—</div><div class="sub">FX</div></div>
-    <div class="card tile ticker" data-ticker="NZDUSD"><div class="sy">NZDUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
-  </div>
-  <p class="muted small" style="margin-top:10px;">Crypto via Binance WS (realtime). FX via FreeForexAPI (fallback: ExchangeRate.Host). Refresh ≈5s.</p>
-</section>
-</section>
+      <div class="carousel-group" style="margin-top:22px;">
+        <div class="card-head"><h3>Forex (majors)</h3></div>
+        <div class="carousel-wrap">
+          <button class="car-btn left" data-target="forex" aria-label="Prev">‹</button>
+          <div class="carousel" data-carousel="forex">
+            <article class="card tile ticker" data-ticker="EURUSD"><div class="tile-body"><div class="sy">EURUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+            <article class="card tile ticker" data-ticker="GBPUSD"><div class="tile-body"><div class="sy">GBPUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+            <article class="card tile ticker" data-ticker="USDJPY"><div class="tile-body"><div class="sy">USDJPY</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+            <article class="card tile ticker" data-ticker="USDCHF"><div class="tile-body"><div class="sy">USDCHF</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+            <article class="card tile ticker" data-ticker="AUDUSD"><div class="tile-body"><div class="sy">AUDUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+            <article class="card tile ticker" data-ticker="USDCAD"><div class="tile-body"><div class="sy">USDCAD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+            <article class="card tile ticker" data-ticker="NZDUSD"><div class="tile-body"><div class="sy">NZDUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
+          </div>
+          <button class="car-btn right" data-target="forex" aria-label="Next">›</button>
+          <div class="edge-mask left"></div><div class="edge-mask right"></div>
+        </div>
+        <p class="muted small" style="margin-top:10px;">Crypto via Binance WS. FX via FreeForexAPI (fallback: ExchangeRate.Host) every ~5s.</p>
+      </div>
+    </section>
 
-  <section class="drop-hero card">
-  <div class="drop-visual" id="dropVisual">
-    <input type="file" id="file" accept="image/png,image/jpeg" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" />
-    <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
-    <div class="dashed"></div>
-    <div class="icon">⬆</div>
-    <h2>Upload or drag a chart screenshot</h2>
-    <p class="muted">PNG or JPG — up to 10MB</p>
-    <div class="row">
-      <input type="file" id="file" accept="image/png,image/jpeg" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;" />
-      <label for="file" class="btn solid" id="browseBtn">Browse image</label>
-      <span class="helper">or drag & drop</span>
-    </div>
-  </div>
-</section>
-<section class="card">
-    <h2>Your Analyses</h2>
-    <div class="actions">
-      <a class="button ghost" href="#upload">Upload another</a>
-      <button class="button ghost" id="refreshBtn">Refresh</button>
-    </div>
-    <div class="code" style="overflow:auto">
-      <table style="width:100%;border-collapse:collapse">
-        <thead>
-          <tr style="text-align:left">
-            <th>Date</th><th>Symbol</th><th>Dir</th><th>Score</th>
-            <th>Entry</th><th>TP</th><th>SL</th><th>R:R</th><th>Status</th><th>Δ pips</th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
-  </section>
-</main>
+    <!-- Upload hero -->
+    <section class="drop-hero card">
+      <div class="drop-visual" id="dropVisual">
+        <div class="dashed"></div>
+        <div class="icon">⬆</div>
+        <h2>Upload or drag a chart screenshot</h2>
+        <p class="muted">PNG or JPG — up to 10MB</p>
+        <div class="row">
+          <input type="file" id="file" accept="image/png,image/jpeg" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;" />
+          <label for="file" class="btn solid" id="browseBtn">Browse image</label>
+          <span class="helper">or drag &amp; drop</span>
+        </div>
+      </div>
+    </section>
 
-<footer class="shell footer"><a href="./">← Home</a></footer>
+    <!-- Analyses -->
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <h3>Your Analyses</h3>
+        <div>
+          <a class="btn small" href="index.html">Upload another</a>
+          <button class="btn small" id="refreshAnalyses">Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Symbol</th><th>Dir</th><th>Score</th><th>Entry</th><th>TP</th><th>SL</th><th>R:R</th><th>Status</th><th>Δ pips</th></tr>
+          </thead>
+          <tbody id="rowsAnalyses"><tr><td colspan="10" style="text-align:center; opacity:.7;">No analyses yet.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
 
-<!-- Firebase (compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebaseConfig.js"></script>
-<script type="module" src="auth.js"></script>
-<script type="module" src="dashboard.js"></script>
+  </main>
+
+  <!-- Scripts -->
   <script type="module" src="theme.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="dashboard.js"></script>
 </body>
 </html>

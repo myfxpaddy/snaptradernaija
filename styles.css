@@ -308,3 +308,12 @@ body{ background:var(--page-bg); color:var(--text); }
 .ticker.down .px{ color:#ef4444; }
 .tick-blip { animation: tickflash .35s ease; }
 @keyframes tickflash { from{ text-shadow:0 0 16px rgba(255,255,255,.8) } to{ text-shadow:none } }
+
+/* THEME (site pages) */
+:root{ --page-bg:#0b1016; --text:#eaf3ff; --muted:#9fb0c7; --card-bg:#0f151c; --border:rgba(255,255,255,.08); }
+[data-theme="light"]{ --page-bg:#f7fafc; --text:#0b1320; --muted:#4a5568; --card-bg:#ffffff; --border:rgba(15,23,42,.10); }
+body{ background:var(--page-bg); color:var(--text); }
+.card{ background:var(--card-bg); border-color:var(--border); }
+.brand-inline .logo{ height:1.2em; width:auto; }
+.themeToggle{ border:1px solid var(--border); background:transparent; color:var(--text); border-radius:999px; padding:8px 10px; cursor:pointer; font-weight:700; }
+.themeToggle:hover{ opacity:.9 }
