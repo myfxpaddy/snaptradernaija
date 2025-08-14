@@ -247,3 +247,11 @@ body{ background:var(--page-bg); color:var(--text); }
 /* Dropzone pointer & layering */
 .drop-visual{ cursor:pointer; position:relative; z-index:0; }
 .drop-hero .dashed{ pointer-events:none; }
+
+.ticker { display:flex; align-items:center; gap:10px; }
+.ticker .price { font-variant-numeric: tabular-nums; font-weight:800; }
+.ticker .change { font-weight:700; opacity:.9 }
+.ticker.up   { color:#22c55e; }
+.ticker.down { color:#ef4444; }
+.tick-blip { animation: tickflash .35s ease; }
+@keyframes tickflash { from{ text-shadow:0 0 10px rgba(255,255,255,.6) } to{ text-shadow:none } }

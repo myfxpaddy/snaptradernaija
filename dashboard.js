@@ -144,3 +144,90 @@ onAuthChange(u=>{
   // Prevent open-in-new-tab when dropping anywhere on the page
   ["dragover","drop"].forEach(ev=> window.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, true));
 })();
+
+
+/* ================= LIVE PRICES =================
+   - Crypto (BTC/ETH): Binance WebSocket (true realtime)
+   - SPX & XAUUSD   : REST polling (Twelve Data), if api key present
+================================================= */
+
+(function(){
+  const els = {
+    BTCUSD: document.querySelector('[data-ticker="BTCUSD"]'),
+    ETHUSD: document.querySelector('[data-ticker="ETHUSD"]'),
+    SPX   : document.querySelector('[data-ticker="SPX"]'),
+    XAUUSD: document.querySelector('[data-ticker="XAUUSD"]')
+  };
+
+  // Utility to render one ticker
+  function render(el, px, prev){
+    if(!el) return;
+    const priceEl = el.querySelector('.price');
+    const root = el;
+    const dir = (prev==null) ? '' : (px > prev ? 'up' : px < prev ? 'down' : '');
+    root.classList.remove('up','down');
+    if(dir) root.classList.add(dir);
+    if(priceEl){
+      priceEl.textContent = (px!=null) ? Number(px).toLocaleString(undefined,{maximumFractionDigits:2}) : '—';
+      priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 200);
+    }
+    return px;
+  }
+
+  // --------- Crypto via Binance WS (no key needed) ----------
+  // map: DOM key -> Binance stream symbol
+  const binance = [
+    { key:'BTCUSD', stream:'btcusdt' },
+    { key:'ETHUSD', stream:'ethusdt' }
+  ];
+  const prev = { BTCUSD:null, ETHUSD:null, SPX:null, XAUUSD:null };
+
+  function openBinance(){
+    try{
+      const streams = binance.map(b=> `${b.stream}@trade`).join('/');
+      const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+      ws.onmessage = (evt)=>{
+        const data = JSON.parse(evt.data);
+        const s = data?.data?.s;     // e.g. BTCUSDT
+        const p = data?.data?.p;     // last price as string
+        if(!s || !p) return;
+        const key = (s==='BTCUSDT')?'BTCUSD':(s==='ETHUSDT')?'ETHUSD':null;
+        if(!key) return;
+        prev[key] = render(els[key], parseFloat(p), prev[key]);
+      };
+      ws.onclose = ()=> setTimeout(openBinance, 1500); // simple auto-reconnect
+      ws.onerror = ()=> { try{ ws.close(); }catch(e){} };
+    }catch(e){ console.warn('Binance WS failed', e); }
+  }
+  openBinance();
+
+  // --------- SPX & XAU via polling (Twelve Data) ----------
+  // Put your key in localStorage once: localStorage.setItem('tw_key','YOUR_KEY')
+  const TW_KEY = localStorage.getItem('tw_key') || null;
+  const TW_BASE = 'https://api.twelvedata.com/price';
+
+  async function fetchPrice(symbol){
+    if(!TW_KEY) return null;
+    try{
+      const url = `${TW_BASE}?symbol=${encodeURIComponent(symbol)}&apikey=${encodeURIComponent(TW_KEY)}`;
+      const r = await fetch(url, { cache:'no-store' });
+      const j = await r.json();
+      const px = parseFloat(j?.price);
+      return Number.isFinite(px) ? px : null;
+    }catch(e){ return null; }
+  }
+
+  async function poll(){
+    if(els.SPX){
+      const px = await fetchPrice('^GSPC'); // S&P 500 index (may be delayed)
+      if(px!=null) prev.SPX = render(els.SPX, px, prev.SPX);
+    }
+    if(els.XAUUSD){
+      const px = await fetchPrice('XAU/USD'); // Gold spot (provider-dependent)
+      if(px!=null) prev.XAUUSD = render(els.XAUUSD, px, prev.XAUUSD);
+    }
+  }
+  // poll immediately then every 45s (free-tier safe)
+  poll();
+  setInterval(poll, 45000);
+})();
