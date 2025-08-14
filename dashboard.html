@@ -42,10 +42,7 @@
       <div class="feature"><h3>XAUUSD</h3><p id="t_xau">—</p></div>
     </div>
   
-    <div class="card" style="margin-top:12px;">
-      <div class="card-head">
-        <h3>Forex (majors)</h3>
-      </div>
+    
       <div class="grid-2" data-forex-root>
         <div class="ticker" data-ticker="EURUSD"><b>EURUSD</b> <span class="price">—</span></div>
         <div class="ticker" data-ticker="GBPUSD"><b>GBPUSD</b> <span class="price">—</span></div>
@@ -57,7 +54,27 @@
       </div>
       <p class="muted" style="margin-top:10px;">FX feed via FreeForexAPI (5s refresh). Crypto via Binance WebSocket.</p>
     </div>
-    </section>
+    
+<section class="card" id="liveCarousels">
+  <div class="card-head"><h3>Live Crypto</h3></div>
+  <div class="carousel" data-carousel="crypto">
+    <div class="card tile ticker" data-ticker="BTCUSD"><div class="sy">BTCUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
+    <div class="card tile ticker" data-ticker="ETHUSD"><div class="sy">ETHUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
+  </div>
+
+  <div class="card-head" style="margin-top:18px;"><h3>Forex (majors)</h3></div>
+  <div class="carousel" data-carousel="forex">
+    <div class="card tile ticker" data-ticker="EURUSD"><div class="sy">EURUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
+    <div class="card tile ticker" data-ticker="GBPUSD"><div class="sy">GBPUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
+    <div class="card tile ticker" data-ticker="USDJPY"><div class="sy">USDJPY</div><div class="px price">—</div><div class="sub">FX</div></div>
+    <div class="card tile ticker" data-ticker="USDCHF"><div class="sy">USDCHF</div><div class="px price">—</div><div class="sub">FX</div></div>
+    <div class="card tile ticker" data-ticker="AUDUSD"><div class="sy">AUDUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
+    <div class="card tile ticker" data-ticker="USDCAD"><div class="sy">USDCAD</div><div class="px price">—</div><div class="sub">FX</div></div>
+    <div class="card tile ticker" data-ticker="NZDUSD"><div class="sy">NZDUSD</div><div class="px price">—</div><div class="sub">FX</div></div>
+  </div>
+  <p class="muted small" style="margin-top:10px;">Crypto via Binance WS (realtime). FX via FreeForexAPI (fallback: ExchangeRate.Host). Refresh ≈5s.</p>
+</section>
+</section>
 
   <section class="drop-hero card">
   <div class="drop-visual" id="dropVisual">

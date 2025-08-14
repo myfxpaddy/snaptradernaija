@@ -313,3 +313,104 @@ onAuthChange(u=>{
   }
   openWS();
 })();
+
+
+/* ====== Live data (Crypto + FX) ====== */
+(function(){
+  // ---- helpers ----
+  function $(sel){ return document.querySelector(sel); }
+  function elFor(sym){ return document.querySelector(`[data-ticker="${sym}"]`); }
+  function render(sym, px, prevMap){
+    const el = elFor(sym); if(!el) return;
+    const priceEl = el.querySelector('.price') || el.querySelector('.px') || (function(){ const s=document.createElement('div'); s.className='px price'; el.appendChild(s); return s; })();
+    const old = prevMap[sym];
+    el.classList.remove('up','down');
+    if(old!=null){ if(px>old) el.classList.add('up'); else if(px<old) el.classList.add('down'); }
+    priceEl.textContent = Number(px).toLocaleString(undefined,{maximumFractionDigits: (sym.endsWith("JPY")?3:5)});
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 220);
+    prevMap[sym] = px;
+  }
+
+  // ---- Crypto via Binance WS ----
+  const prevC = {BTCUSD:null, ETHUSD:null};
+  (function openWS(){
+    try{
+      const streams = ['btcusdt@trade','ethusdt@trade'].join('/');
+      const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+      ws.onmessage = (evt)=>{
+        const d = JSON.parse(evt.data); const s = d?.data?.s; const p = parseFloat(d?.data?.p);
+        if(!s || !Number.isFinite(p)) return;
+        const key = (s==='BTCUSDT')?'BTCUSD':(s==='ETHUSDT')?'ETHUSD':null;
+        if(key) render(key, p, prevC);
+      };
+      ws.onclose = ()=> setTimeout(openWS, 1500);
+      ws.onerror = ()=> { try{ws.close();}catch(e){} };
+    }catch(e){ setTimeout(openWS, 2500); }
+  })();
+
+  // ---- FX via FreeForexAPI (fallback to ExchangeRate.Host) ----
+  const majors = ['EURUSD','GBPUSD','USDJPY','USDCHF','AUDUSD','USDCAD','NZDUSD'];
+  const prevF = Object.fromEntries(majors.map(m=>[m,null]));
+
+  async function pollFreeForex(){
+    const url = `https://www.freeforexapi.com/api/live?pairs=${majors.join(',')}`;
+    const r = await fetch(url, {cache:'no-store'});
+    if(!r.ok) throw new Error('freeforex not ok');
+    const j = await r.json();
+    const rates = j?.rates || {};
+    majors.forEach(sym=>{
+      const v = rates[sym]?.rate;
+      if(Number.isFinite(v)) render(sym, v, prevF);
+    });
+    return true;
+  }
+
+  // Fallback: ExchangeRate.Host (build pairs from a base)
+  async function pollERH(){
+    // Strategy: request with base=USD and base=EUR/GBP/AUD/NZD to compute pairs precisely
+    const bases = ['USD','EUR','GBP','AUD','NZD']; // we can compute CHF/JPY from USD base
+    const all = {};
+    for (const b of bases){
+      const resp = await fetch(`https://api.exchangerate.host/latest?base=${b}`, {cache:'no-store'});
+      const j = await resp.json(); if(j && j.rates) all[b]=j.rates;
+    }
+    const get = (base, quote)=> (all[base] && all[base][quote]) ? all[base][quote] : null;
+    const map = {
+      EURUSD: get('EUR','USD'),
+      GBPUSD: get('GBP','USD'),
+      USDJPY: get('USD','JPY'),
+      USDCHF: get('USD','CHF'),
+      AUDUSD: get('AUD','USD'),
+      USDCAD: get('USD','CAD'),
+      NZDUSD: get('NZD','USD')
+    };
+    Object.entries(map).forEach(([k,v])=>{ if(Number.isFinite(v)) render(k, v, prevF); });
+  }
+
+  async function pollFX(){
+    try{
+      await pollFreeForex();
+    }catch(_e){
+      try{ await pollERH(); }catch(__e){ /* both failed — keep old values */ }
+    }
+  }
+  pollFX();
+  setInterval(pollFX, 5000);
+
+  // ---- Auto-scroll both carousels every few seconds (pause on hover) ----
+  function autoScrollCarousel(rootSel){
+    const root = document.querySelector(rootSel); if(!root) return;
+    let paused = false;
+    root.addEventListener('mouseenter', ()=> paused=true);
+    root.addEventListener('mouseleave', ()=> paused=false);
+    setInterval(()=>{
+      if(paused) return;
+      const max = root.scrollWidth - root.clientWidth;
+      const next = (root.scrollLeft + root.clientWidth * 0.9);
+      root.scrollTo({ left: (next>=max?0:next), behavior:'smooth' });
+    }, 3500);
+  }
+  autoScrollCarousel('.carousel[data-carousel="crypto"]');
+  autoScrollCarousel('.carousel[data-carousel="forex"]');
+
+})();

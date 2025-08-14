@@ -255,3 +255,22 @@ body{ background:var(--page-bg); color:var(--text); }
 .ticker.down { color:#ef4444; }
 .tick-blip { animation: tickflash .35s ease; }
 @keyframes tickflash { from{ text-shadow:0 0 10px rgba(255,255,255,.6) } to{ text-shadow:none } }
+
+/* ===== Ticker cards + carousel ===== */
+.carousel{ display:grid; grid-auto-flow:column; grid-auto-columns: clamp(220px, 35vw, 300px);
+  gap:14px; overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; padding:10px 2px; }
+.carousel::-webkit-scrollbar{ height:8px }
+.carousel::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.12); border-radius:10px }
+
+.tile{ scroll-snap-align:center; }
+.tile .sy{ font-weight:900; letter-spacing:.5px; font-size:18px; }
+.tile .px{ font-variant-numeric: tabular-nums; font-size:22px; font-weight:900; margin-top:6px; }
+.tile .sub{ opacity:.7; font-size:12px; margin-top:4px; }
+.ticker.up   .px{ color:#22c55e; }
+.ticker.down .px{ color:#ef4444; }
+.tick-blip { animation: tickflash .35s ease; }
+@keyframes tickflash { from{ text-shadow:0 0 14px rgba(255,255,255,.7) } to{ text-shadow:none } }
+
+/* make tiles pop */
+.card.tile{ background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,.25); }
+.card.tile:hover{ transform: translateY(-2px); transition: transform .15s ease; }
