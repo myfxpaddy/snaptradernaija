@@ -97,3 +97,36 @@ onAuthChange(u=>{
   ["dragleave","drop"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
   drop.addEventListener("drop", (e)=>{ const dt=e.dataTransfer; if(dt && dt.files && dt.files[0]){ file.files = dt.files; file.dispatchEvent(new Event("change")); }});
 })();
+
+
+/* --- Uploader UX: clickable + global DnD --- */
+(function(){
+  const drop = document.getElementById("dropVisual");
+  const file = document.getElementById("file");
+  const browse = document.getElementById("browseBtn");
+
+  // Open picker from the button or clicking anywhere in the drop area
+  function openPicker(e){ e && e.preventDefault(); if (file) file.click(); }
+  browse && browse.addEventListener("click", openPicker);
+  drop   && drop.addEventListener("click", (e)=> {
+    // avoid triggering when clicking on buttons/links inside the area
+    const t = e.target; if (t.closest("button") || t.closest("a")) return;
+    openPicker(e);
+  });
+
+  // Highlight on drag
+  ["dragenter","dragover"].forEach(ev=> drop && drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("drag-over"); }));
+  ["dragleave","drop"].forEach(ev=> drop && drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
+
+  // Accept drop
+  drop && drop.addEventListener("drop", (e)=>{
+    e.preventDefault();
+    const dt=e.dataTransfer; if(dt && dt.files && dt.files[0]){
+      file.files = dt.files;
+      file.dispatchEvent(new Event("change", {bubbles:true}));
+    }
+  });
+
+  // Prevent the browser from opening the image when dropped anywhere else
+  ["dragover","drop"].forEach(ev=> document.addEventListener(ev, e=>{ e.preventDefault(); }));
+})();

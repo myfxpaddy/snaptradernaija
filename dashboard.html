@@ -44,15 +44,16 @@
   </section>
 
   <section class="drop-hero card">
-  <div class="drop-visual">
+  <div class="drop-visual" id="dropVisual">
+    <input type="file" id="file" accept="image/png,image/jpeg" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" />
     <div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
     <div class="dashed"></div>
     <div class="icon">⬆</div>
     <h2>Upload or drag a chart screenshot</h2>
     <p class="muted">PNG or JPG — up to 10MB</p>
     <div class="row">
-      <label class="btn solid" for="file">Choose image</label>
-      <a class="btn ghost" href="./index.html#tool">Use the home tool</a>
+      <button type="button" class="btn solid" id="browseBtn">Browse image</button>
+      <span class="helper">or drag & drop</span>
     </div>
   </div>
 </section>
@@ -85,5 +86,6 @@
 <script src="firebaseConfig.js"></script>
 <script type="module" src="auth.js"></script>
 <script type="module" src="dashboard.js"></script>
+  <script type="module" src="theme.js"></script>
 </body>
 </html>
