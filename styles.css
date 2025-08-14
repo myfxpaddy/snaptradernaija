@@ -509,3 +509,45 @@ th{ font-size:12px; letter-spacing:.04em; opacity:.8; }
 .tiny{ font-size:12px; }
 .mt-1{ margin-top:10px; } .mt-2{ margin-top:18px; }
 .flex{ display:flex; align-items:center; gap:10px; } .between{ justify-content:space-between; }
+
+/* === DASHBOARD THEME FIX (match homepage exactly) === */
+.page .card,
+#liveCarousels,
+#liveCarousels .card,
+#liveCarousels .carousel .tile {
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.22);
+}
+
+/* Make masks use page bg so edges blend like the homepage */
+.edge-mask.left  { background: linear-gradient(90deg, var(--page-bg), rgba(0,0,0,0)) !important; }
+.edge-mask.right { background: linear-gradient(270deg, var(--page-bg), rgba(0,0,0,0)) !important; }
+
+/* Keep tiles dark even if someone toggles theme */
+[data-theme="light"] .card,
+[data-theme="light"] .card.tile,
+[data-theme="light"] #liveCarousels,
+[data-theme="light"] #liveCarousels .card,
+[data-theme="light"] #liveCarousels .carousel .tile {
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+/* Uniform tile look = homepage */
+.card.tile{
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px;
+  padding: 26px 22px;
+}
+
+/* Headings/text visibility over dark */
+.section-title, .label, .val, .muted { color: var(--text); opacity: 1; }
+.muted { color: var(--muted); opacity: 1; }
+
+/* Normalize stats card background */
+.stat-card, .stat { background: var(--card-bg) !important; border: 1px solid var(--border) !important; }
+.stat .label{ opacity:.85; }
