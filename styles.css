@@ -551,3 +551,27 @@ th{ font-size:12px; letter-spacing:.04em; opacity:.8; }
 /* Normalize stats card background */
 .stat-card, .stat { background: var(--card-bg) !important; border: 1px solid var(--border) !important; }
 .stat .label{ opacity:.85; }
+
+/* === Bigger upload area on dashboard & home === */
+.drop {
+  min-height: 280px;        /* Increase height */
+  padding: 36px 20px;       /* More padding inside */
+  font-size: 1.1rem;        /* Larger text */
+}
+
+.drop .drop-text {
+  font-size: 1.15rem;       /* Larger helper text */
+}
+
+.fancy .drop-graphic {
+  transform: scale(1.25);   /* Make rings bigger */
+}
+
+.actions button,
+.actions .button,
+.actions .ghost {
+  padding: 14px 20px;       /* Bigger buttons */
+  font-size: 1rem;
+  border-radius: 14px;
+}
+
