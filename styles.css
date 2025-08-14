@@ -147,3 +147,18 @@ button.ghost,.button.ghost{background:transparent;border:1px solid rgba(255,255,
 .modal-card{background:#11141B;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;min-width:320px;box-shadow:var(--shadow)}
 .modal-card label{display:block;margin:10px 0}
 .modal-card input{width:100%;padding:10px;border-radius:10px;border:1px solid #2a2f3a;background:#0f131a;color:var(--text)}
+
+/* === Auth modal polish === */
+.modal-card { color: #E8F0F7; background: rgba(18,20,24,0.92); border: 1px solid rgba(255,255,255,0.08); }
+.modal-card input, .modal-card select, .modal-card textarea {
+  background: #0f1115; color:#E8F0F7; border:1px solid #2a2f3a; border-radius:12px; padding:10px 12px;
+}
+.modal-card input::placeholder, .modal-card textarea::placeholder { color:#6b7280; }
+.modal-card label { display:flex; flex-direction:column; gap:6px; font-weight:600; margin:10px 0; }
+.modal-card .grid2 { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; }
+.modal-card .grid2 .full { grid-column: 1 / -1; }
+.modal-card .check { flex-direction:row; align-items:center; gap:10px; font-weight:500; }
+.modal-header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.modal-logo { height:24px; width:auto; filter: drop-shadow(0 0 6px rgba(0,255,200,0.25)); }
+.row-links { display:flex; justify-content:space-between; margin-top:8px; font-size: 0.95rem; }
+.verify { margin-top:12px; padding:10px; border:1px dashed #2a2f3a; border-radius:12px; }
