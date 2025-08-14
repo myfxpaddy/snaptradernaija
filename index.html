@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <title>SnapTraderNaija — Upload your chart. Get your trade plan.</title>
   <meta name="description" content="Free, fast trade analysis from your chart screenshots. Score, direction, TP/SL and R:R."/>
   <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
@@ -11,6 +11,15 @@
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
+
+  <!-- Animated background (lines + glows) -->
+  <div class="bg">
+    <div class="grid-lines"></div>
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="glow g3"></div>
+  </div>
+
   <!-- NAV -->
   <nav class="nav">
     <div class="nav-inner shell">
@@ -18,16 +27,17 @@
         <img src="logo.svg" alt="SnapTraderNaija" class="logo"/>
         <span class="brand-name">SnapTraderNaija</span>
       </a>
-      <div class="nav-links">
+      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <div class="nav-links" id="navLinks">
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
         <a href="#tool">Try it</a>
         <a href="docs.html">Docs</a>
         <a href="about.html">About</a>
-      </div>
-      <div class="nav-actions">
-        <button id="loginOpenBtn" class="ghost small">Log in</button>
-        <button id="signupOpenBtn" class="small">Sign up</button>
+        <div class="nav-actions">
+          <button id="loginOpenBtn" class="ghost small">Log in</button>
+          <button id="signupOpenBtn" class="small">Sign up</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -36,82 +46,104 @@
   <header class="hero shell">
     <div class="hero-grid">
       <div>
-        <h1>Upload your chart. <span class="accent">Get your trade plan.</span></h1>
-        <p class="tagline">Score (1–100), direction (BUY/SELL/UNCLEAR), TP/SL with pip distances, and R:R — all in seconds.</p>
+        <h1>Converts your <span class="accent">chart screenshot</span> into a <span class="accent">trade plan</span>.</h1>
+        <p class="tagline">Direction (BUY/SELL/UNCLEAR), score 1–100, TP/SL (price) + pip distances, and R:R — in seconds.</p>
         <div class="hero-cta">
           <a href="#tool" class="button">Try it free</a>
-          <a href="#how" class="button ghost">See how it works</a>
+          <a href="#how" class="button ghost">How it works</a>
         </div>
         <div class="stats-row">
           <div class="chip">No signup to upload</div>
-          <div class="chip">Login required to view result</div>
-          <div class="chip">100% free</div>
+          <div class="chip">Login to view results</div>
+          <div class="chip">Open & free</div>
         </div>
       </div>
       <div class="hero-card">
         <div class="hero-card-inner">
-          <h3 class="tight">Live Preview</h3>
-          <p class="muted tight">Drag a PNG/JPG and click Analyze — result appears after login.</p>
-          <img src="favicon.svg" alt="Preview" class="hero-art"/>
+          <div class="ribbon">Live Preview</div>
+          <div class="proto-grid">
+            <div class="proto p1"></div>
+            <div class="proto p2"></div>
+            <div class="proto p3"></div>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- FEATURES -->
+  <!-- FEATURE CARDS (sticky notes) -->
   <section id="features" class="shell">
-    <div class="section">
-      <h2>Why traders use SnapTraderNaija</h2>
-      <div class="feature-grid">
-        <div class="feature">
-          <h3>Screenshot → Plan</h3>
-          <p>Upload chart screenshots from phone or desktop. The backend LLM (your model later) handles vision + analysis.</p>
-        </div>
-        <div class="feature">
-          <h3>Actionable outputs</h3>
-          <p>Direction, score, TP/SL (price), pip distances to TP/SL, and computed Risk–Reward.</p>
-        </div>
-        <div class="feature">
-          <h3>News & evidence</h3>
-          <p>Notes and evidence fields (e.g., trend, S/R, news hints) for transparency.</p>
-        </div>
-        <div class="feature">
-          <h3>Fast & lightweight</h3>
-          <p>Static front end on GitHub Pages. API can be deployed to Fly.io free tier.</p>
-        </div>
+    <h2 class="section-title">Why traders use SnapTraderNaija</h2>
+    <div class="sticky-grid">
+      <article class="sticky s1">
+        <h3>Screenshot → Plan</h3>
+        <p>Upload PNG/JPG up to 10MB from phone or desktop; backend LLM handles vision + reasoning.</p>
+        <span class="pin"></span>
+      </article>
+      <article class="sticky s2">
+        <h3>Actionable outputs</h3>
+        <p>Direction, score, TP/SL price, pip distances, and computed R:R — formatted clearly.</p>
+        <span class="pin"></span>
+      </article>
+      <article class="sticky s3">
+        <h3>Evidence & notes</h3>
+        <p>Short rationale + labeled evidence (Trend, S/R, News) for transparency.</p>
+        <span class="pin"></span>
+      </article>
+      <article class="sticky s4">
+        <h3>Fast & lightweight</h3>
+        <p>Static site on GitHub Pages. API can run on Fly.io free tier. Zero bloat.</p>
+        <span class="pin"></span>
+      </article>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS (timeline) -->
+  <section id="how" class="shell">
+    <h2 class="section-title">How it works</h2>
+    <div class="timeline">
+      <div class="step">
+        <div class="dot"></div>
+        <div class="content"><h4>1) Upload</h4><p>Drop a chart screenshot (PNG/JPG). We’ll validate size & type.</p></div>
+      </div>
+      <div class="step">
+        <div class="dot"></div>
+        <div class="content"><h4>2) Analyze</h4><p>Front end calls <code>/analyze</code>. (Mock now; your LLM later.)</p></div>
+      </div>
+      <div class="step">
+        <div class="dot"></div>
+        <div class="content"><h4>3) Gate</h4><p>Result card is shown but blurred until you log in or sign up.</p></div>
+      </div>
+      <div class="step">
+        <div class="dot"></div>
+        <div class="content"><h4>4) Reveal</h4><p>After auth, see Direction, Score, TP/SL, Pips & R:R, Notes & Evidence.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
-  <section id="how" class="shell">
-    <div class="section">
-      <h2>How it works</h2>
-      <ol class="steps">
-        <li><b>Upload</b> a chart screenshot (PNG/JPG up to 10MB).</li>
-        <li>The site sends it to the API (mock now; your LLM later).</li>
-        <li>The API returns direction, score, TP/SL, pips, and R:R.</li>
-        <li><b>Login required</b> to reveal results. Sign up is instant and free.</li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- TOOL -->
+  <!-- TOOL (enhanced upload) -->
   <main id="tool" class="shell">
     <section class="card">
-      <h2>Upload Chat Screenshot</h2>
-      <form id="uploadForm" class="uploader" novalidate>
-        <label class="drop" for="file">
+      <h2>Try the Analyzer</h2>
+      <form id="uploadForm" class="uploader glass" novalidate>
+        <label class="drop fancy" for="file" id="dropArea">
           <input id="file" type="file" accept="image/png,image/jpeg"/>
-          <span class="drop-text">Drop image here or <b>browse</b><br/><small>PNG or JPG — up to 10MB</small></span>
+          <div class="drop-graphic">
+            <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+          </div>
+          <span class="drop-text">
+            <b>Drop image</b> here or <b>browse</b><br/><small>PNG or JPG — up to 10MB</small>
+          </span>
+          <img class="preview hidden" id="preview" alt="preview"/>
         </label>
         <div class="actions">
           <button type="submit" id="analyzeBtn">Analyze</button>
           <button type="button" id="demoBtn" class="ghost">Demo Result</button>
+          <button type="button" id="clearBtn" class="ghost">Clear</button>
         </div>
         <div id="progress" class="progress hidden">
           <div class="bar" id="bar"></div>
-          <span id="progressText">Processing…</span>
+          <span id="progressText">Uploading…</span>
         </div>
         <p id="error" class="error hidden"></p>
       </form>
@@ -131,10 +163,12 @@
       </div>
       <div class="notes"><h3>Notes</h3><ul id="notes"></ul></div>
       <div class="notes"><h3>Evidence</h3><ul id="evidence"></ul></div>
+
+      <!-- Login gate overlay -->
       <div class="gate hidden" id="gate">
         <div class="gate-inner">
           <h3>Login required</h3>
-          <p class="muted">You can upload without an account, but you need to log in to view results.</p>
+          <p class="muted">Upload is open. To reveal the result, please log in or sign up.</p>
           <div class="gate-actions">
             <button id="gateLoginBtn">Log in</button>
             <button class="ghost" id="gateSignupBtn">Sign up</button>
@@ -143,24 +177,23 @@
       </div>
     </section>
 
-    <section class="card fineprint">
-      <p>Not financial advice. Educational use only — a fun way to blend AI and trading.</p>
+    <section class="cta card">
+      <h3>Ready to connect your own LLM?</h3>
+      <p class="muted">We’ll swap the mock response for your real model through a single endpoint.</p>
+      <a class="button" href="docs.html">Read the API contract</a>
     </section>
   </main>
 
-  <!-- FAQ -->
+  <!-- FAQ & FOOTER -->
   <section class="shell">
-    <div class="section">
-      <h2>FAQ</h2>
-      <div class="faq">
-        <details><summary>Is it free?</summary><p>Yes. The site is free to use. We may add pro features later.</p></details>
-        <details><summary>Do you store my images?</summary><p>For now, uploads are processed in-memory and discarded. Your final setup decides retention.</p></details>
-        <details><summary>Do I need to run servers for the live site?</summary><p>No. GitHub Pages hosts the site automatically. Only the API needs hosting.</p></details>
-      </div>
+    <h2 class="section-title">FAQ</h2>
+    <div class="faq">
+      <details><summary>Is the site live without running servers?</summary><p>Yes — GitHub Pages hosts the front end automatically. Only the API needs hosting.</p></details>
+      <details><summary>Do you store images?</summary><p>Mock API processes in-memory and discards. Your final setup decides retention.</p></details>
+      <details><summary>Is it really free?</summary><p>Yes. We may add pro features later, but core uploading is free.</p></details>
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="shell footer">
     <div>© <span id="year"></span> SnapTraderNaija</div>
     <div class="footer-links">

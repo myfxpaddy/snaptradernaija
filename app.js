@@ -1,5 +1,11 @@
-// API base: local by default; later set with localStorage.setItem("apiBase","https://your-api")
+// API base: local by default; you can override from the browser console later:
+// localStorage.setItem("apiBase","https://snaptradernaija-api.fly.dev")
 const API_BASE = localStorage.getItem("apiBase") || "http://localhost:8787";
+
+/* ---------- Mobile nav ---------- */
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+menuBtn?.addEventListener("click", ()=> navLinks.classList.toggle("open"));
 
 /* ---------- Auth (client-side placeholder) ---------- */
 const authModal = document.getElementById("authModal");
@@ -21,10 +27,10 @@ function openAuth(mode){
   authModal.showModal();
 }
 function closeAuth(){ authModal.close(); }
-if(loginOpenBtn) loginOpenBtn.onclick = ()=>openAuth("login");
-if(signupOpenBtn) signupOpenBtn.onclick = ()=>openAuth("signup");
-if(gateLoginBtn) gateLoginBtn.onclick = ()=>openAuth("login");
-if(gateSignupBtn) gateSignupBtn.onclick = ()=>openAuth("signup");
+loginOpenBtn?.addEventListener("click", ()=>openAuth("login"));
+signupOpenBtn?.addEventListener("click", ()=>openAuth("signup"));
+gateLoginBtn?.addEventListener("click", ()=>openAuth("login"));
+gateSignupBtn?.addEventListener("click", ()=>openAuth("signup"));
 document.getElementById("authCancelBtn")?.addEventListener("click",(e)=>{ e.preventDefault(); closeAuth(); });
 
 authForm?.addEventListener("submit",(e)=>{
@@ -32,21 +38,20 @@ authForm?.addEventListener("submit",(e)=>{
   const email = authEmail.value.trim();
   const pass = authPass.value.trim();
   if(!email || !pass) return;
-  // Placeholder auth: save a simple token. Replace with real API later.
   localStorage.setItem("stn_user", JSON.stringify({ email, at: Date.now() }));
   closeAuth();
-  // If a result was blocked by gate, reveal it now
   const pending = localStorage.getItem("stn_pending_result");
   if(pending){
-    const data = JSON.parse(pending);
+    renderResult(JSON.parse(pending), true);
     localStorage.removeItem("stn_pending_result");
-    renderResult(data, /*forceShow*/ true);
   }
 });
 
-/* ---------- App (upload + results) ---------- */
+/* ---------- Upload & analyze ---------- */
 const fileInput   = document.getElementById("file");
 const form        = document.getElementById("uploadForm");
+const dropArea    = document.getElementById("dropArea");
+const previewImg  = document.getElementById("preview");
 const progressEl  = document.getElementById("progress");
 const barEl       = document.getElementById("bar");
 const errorEl     = document.getElementById("error");
@@ -62,6 +67,7 @@ const rrEl        = document.getElementById("rr");
 const notesEl     = document.getElementById("notes");
 const evidenceEl  = document.getElementById("evidence");
 const demoBtn     = document.getElementById("demoBtn");
+const clearBtn    = document.getElementById("clearBtn");
 document.getElementById("year") && (document.getElementById("year").textContent = new Date().getFullYear());
 
 function setDirection(d){
@@ -74,13 +80,10 @@ function setDirection(d){
 
 function renderResult(res, forceShow=false){
   resultsCard.classList.remove("hidden");
-  // Gate: require login to reveal numbers (but still show the card & gate overlay)
   const canShow = forceShow || isLoggedIn();
   if(!canShow){
     gateEl?.classList.remove("hidden");
-    // Save data so we can render after login
     localStorage.setItem("stn_pending_result", JSON.stringify(res));
-    // Obfuscate values until login
     setDirection("—"); scoreEl.textContent="—"; entryEl.textContent="—";
     tpEl.textContent="—"; slEl.textContent="—"; pipsToTPEl.textContent="—"; pipsToSLEl.textContent="—"; rrEl.textContent="—";
     notesEl.innerHTML=""; evidenceEl.innerHTML="";
@@ -108,6 +111,35 @@ function renderResult(res, forceShow=false){
   });
 }
 
+/* Drag & drop + preview */
+["dragenter","dragover"].forEach(evt=>{
+  dropArea?.addEventListener(evt, (e)=>{ e.preventDefault(); dropArea.classList.add("hover"); });
+});
+["dragleave","drop"].forEach(evt=>{
+  dropArea?.addEventListener(evt, (e)=>{ e.preventDefault(); dropArea.classList.remove("hover"); });
+});
+dropArea?.addEventListener("drop", (e)=>{
+  const f = e.dataTransfer?.files?.[0];
+  if(f){ fileInput.files = e.dataTransfer.files; showPreview(f); }
+});
+fileInput?.addEventListener("change", (e)=>{
+  const f = e.target.files?.[0];
+  if(f) showPreview(f);
+});
+function showPreview(f){
+  if(!/^image\/(png|jpeg)$/.test(f.type)) return;
+  const url = URL.createObjectURL(f);
+  previewImg?.classList.remove("hidden");
+  previewImg.src = url;
+}
+
+clearBtn?.addEventListener("click", ()=>{
+  fileInput.value = "";
+  previewImg?.classList.add("hidden");
+  resultsCard?.classList.add("hidden");
+  errorEl?.classList.add("hidden");
+});
+
 async function analyze(file){
   errorEl.classList.add("hidden"); resultsCard.classList.add("hidden"); progressEl.classList.remove("hidden");
   try{
@@ -115,7 +147,7 @@ async function analyze(file){
     let pct=10; const t=setInterval(()=>{ pct=Math.min(95,pct+6); barEl.style.width=pct+"%"; }, 120);
     const res = await fetch(`${API_BASE}/analyze`, { method:"POST", body:data });
     clearInterval(t); barEl.style.width="100%";
-    if(!res.ok){ const msg = await res.text(); throw new Error(msg || \`Server responded \${res.status}\`); }
+    if(!res.ok){ const msg = await res.text(); throw new Error(msg || `Server responded ${res.status}`); }
     const json = await res.json();
     renderResult(json);
   }catch(err){
@@ -135,9 +167,9 @@ form?.addEventListener("submit", (e)=>{
 
 demoBtn?.addEventListener("click", ()=>{
   renderResult({
-    direction:"BUY", score:84, entry:2420.0, tp:2425.5, sl:2416.2, pipSize:0.10,
+    direction:"BUY", score:88, entry:2420.0, tp:2425.5, sl:2416.2, pipSize:0.10,
     pipsToTP:55.0, pipsToSL:38.0, rr:55.0/38.0,
-    notes:["Bullish structure on M15 and H1","Clean retest of 2419.8","No red-flag news in next 2h"],
+    notes:["Bullish structure on M15/H1","Clean retest of 2419.8","No red-flag news in next 2h"],
     evidence:[{label:"Trend",value:"EMA stack up"},{label:"S/R",value:"2419.8 support held twice"}]
   });
 });
