@@ -146,7 +146,7 @@ onAuthChange(u=>{
 })();
 
 
-/* ================= LIVE PRICES =================
+/* (replaced by hardened sections) */
    - Crypto (BTC/ETH): Binance WebSocket (true realtime)
    - SPX & XAUUSD   : REST polling (Twelve Data), if api key present
 ================================================= */
@@ -230,4 +230,86 @@ onAuthChange(u=>{
   // poll immediately then every 45s (free-tier safe)
   poll();
   setInterval(poll, 45000);
+})();
+
+
+/* ========= FreeForexAPI polling (majors) ========= */
+(function(){
+  const pairs = ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD"];
+  const els = Object.fromkeys ? Object.fromkeys(pairs) : pairs.reduce((o,k)=> (o[k]=document.querySelector(`[data-ticker="${k}"]`), o), {});
+  let prev = {};
+  function render(sym, px){
+    const el = els[sym]; if(!el) return;
+    const priceEl = el.querySelector('.price') || (function(){ const sp = document.createElement('span'); sp.className='price'; el.appendChild(sp); return sp; })();
+    const old = prev[sym];
+    el.classList.remove('up','down');
+    if(old!=null){
+      if(px>old) el.classList.add('up');
+      else if(px<old) el.classList.add('down');
+    }
+    priceEl.textContent = Number(px).toLocaleString(undefined, {maximumFractionDigits: 5});
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 200);
+    prev[sym] = px;
+  }
+  async function poll(){
+    try{
+      const url = `https://www.freeforexapi.com/api/live?pairs=${pairs.join(",")}`;
+      const r = await fetch(url, { cache:"no-store" });
+      const j = await r.json();
+      // shape: { rates: { EURUSD:{rate:1.0, ...}, ...}, code:200 }
+      const rates = j && j.rates ? j.rates : {};
+      pairs.forEach(sym=>{
+        const rate = rates[sym] && rates[sym].rate;
+        if(Number.isFinite(rate)) render(sym, rate);
+      });
+    }catch(e){ /* ignore, try again */ }
+  }
+  poll();
+  setInterval(poll, 5000); // 5s free polling
+})();
+
+
+/* ========= Binance WS (BTC/ETH) hardened ========= */
+(function(){
+  const map = { BTCUSD:"btcusdt", ETHUSD:"ethusdt" };
+  const els = {
+    BTCUSD: document.querySelector('[data-ticker="BTCUSD"]'),
+    ETHUSD: document.querySelector('[data-ticker="ETHUSD"]')
+  };
+  let prev = { BTCUSD:null, ETHUSD:null };
+
+  function ensurePriceEl(el){
+    if(!el) return null;
+    return el.querySelector('.price') || (()=>{ const s=document.createElement('span'); s.className='price'; el.appendChild(s); return s; })();
+  }
+  function render(key, px){
+    const root = els[key]; if(!root) return;
+    const priceEl = ensurePriceEl(root);
+    const old = prev[key];
+    root.classList.remove('up','down');
+    if(old!=null){
+      if(px>old) root.classList.add('up'); else if(px<old) root.classList.add('down');
+    }
+    priceEl.textContent = Number(px).toLocaleString(undefined,{maximumFractionDigits:2});
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 200);
+    prev[key] = px;
+  }
+
+  function openWS(){
+    try{
+      const streams = Object.values(map).map(s=>`${s}@trade`).join('/');
+      const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+      ws.onmessage = (evt)=>{
+        const data = JSON.parse(evt.data);
+        const s = data?.data?.s;  // e.g., BTCUSDT
+        const p = parseFloat(data?.data?.p);
+        if(!s || !Number.isFinite(p)) return;
+        const key = s==="BTCUSDT" ? "BTCUSD" : s==="ETHUSDT" ? "ETHUSD" : null;
+        if(key) render(key, p);
+      };
+      ws.onclose = ()=> setTimeout(openWS, 1500);
+      ws.onerror = ()=> { try{ ws.close(); }catch(_e){} };
+    }catch(e){ setTimeout(openWS, 2500); }
+  }
+  openWS();
 })();
