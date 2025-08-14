@@ -11,10 +11,21 @@
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-  <div class="bg"><div class="grid-lines"></div><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div></div>
+  <!-- Animated background -->
+  <div class="bg">
+    <div class="grid-lines"></div>
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="glow g3"></div>
+  </div>
+
+  <!-- NAV -->
   <nav class="nav">
     <div class="nav-inner shell">
-      <a class="brand-inline" href="./"><img src="logo.svg" class="logo"/><span class="brand-name">SnapTraderNaija</span></a>
+      <a class="brand-inline" href="./">
+        <img src="logo.svg" alt="SnapTraderNaija" class="logo"/>
+        <span class="brand-name">SnapTraderNaija</span>
+      </a>
       <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
       <div class="nav-links" id="navLinks">
         <a href="#features">Features</a>
@@ -32,11 +43,74 @@
     </div>
   </nav>
 
-  <!-- HERO/SECTIONS/TOOL — (same as your current pro UI) -->
-  <!-- (kept the same content/animations as before, omitted here for brevity) -->
-  <!-- We keep the upload tool, gate, FAQ, footer, and modal exactly as before -->
+  <!-- HERO -->
+  <header class="hero shell">
+    <div class="hero-grid">
+      <div>
+        <h1>Converts your <span class="accent">chart screenshot</span> into a <span class="accent">trade plan</span>.</h1>
+        <p class="tagline">Direction (BUY/SELL/UNCLEAR), score 1–100, TP/SL (price) + pip distances, and R:R — in seconds.</p>
+        <div class="hero-cta">
+          <a href="#tool" class="button">Try it free</a>
+          <a href="#how" class="button ghost">How it works</a>
+        </div>
+        <div class="stats-row">
+          <div class="chip">No signup to upload</div>
+          <div class="chip">Login to view results</div>
+          <div class="chip">Open & free</div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-inner">
+          <div class="ribbon">Live Preview</div>
+          <div class="proto-grid">
+            <div class="proto p1"></div>
+            <div class="proto p2"></div>
+            <div class="proto p3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <!-- existing content preserved -->
+  <!-- FEATURE CARDS -->
+  <section id="features" class="shell">
+    <h2 class="section-title">Why traders use SnapTraderNaija</h2>
+    <div class="sticky-grid">
+      <article class="sticky s1">
+        <h3>Screenshot → Plan</h3>
+        <p>Upload PNG/JPG up to 10MB from phone or desktop; backend LLM handles vision + reasoning.</p>
+        <span class="pin"></span>
+      </article>
+      <article class="sticky s2">
+        <h3>Actionable outputs</h3>
+        <p>Direction, score, TP/SL price, pip distances, and computed R:R — formatted clearly.</p>
+        <span class="pin"></span>
+      </article>
+      <article class="sticky s3">
+        <h3>Evidence & notes</h3>
+        <p>Short rationale + labeled evidence (Trend, S/R, News) for transparency.</p>
+        <span class="pin"></span>
+      </article>
+      <article class="sticky s4">
+        <h3>Fast & lightweight</h3>
+        <p>Static site on GitHub Pages. API on Fly.io free tier. Zero bloat.</p>
+        <span class="pin"></span>
+      </article>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="shell">
+    <h2 class="section-title">How it works</h2>
+    <div class="timeline">
+      <div class="step"><div class="dot"></div><div class="content"><h4>1) Upload</h4><p>Drop a chart screenshot (PNG/JPG). We’ll validate size & type.</p></div></div>
+      <div class="step"><div class="dot"></div><div class="content"><h4>2) Analyze</h4><p>Front end calls <code>/analyze</code>. (Mock now; your LLM later.)</p></div></div>
+      <div class="step"><div class="dot"></div><div class="content"><h4>3) Gate</h4><p>Result appears blurred until you log in or sign up.</p></div></div>
+      <div class="step"><div class="dot"></div><div class="content"><h4>4) Reveal</h4><p>After auth, see Direction, Score, TP/SL, Pips & R:R, Notes & Evidence.</p></div></div>
+    </div>
+  </section>
+
+  <!-- TOOL -->
   <main id="tool" class="shell">
     <section class="card">
       <h2>Upload Chat Screenshot</h2>
@@ -73,14 +147,36 @@
       <div class="notes"><h3>Evidence</h3><ul id="evidence"></ul></div>
       <div class="gate hidden" id="gate"><div class="gate-inner"><h3>Login required</h3><p class="muted">Upload is open. To reveal the result, please log in or sign up.</p><div class="gate-actions"><button id="gateLoginBtn">Log in</button><button class="ghost" id="gateSignupBtn">Sign up</button></div></div></div>
     </section>
+
+    <section class="cta card">
+      <h3>Ready to connect your own LLM?</h3>
+      <p class="muted">We’ll swap the mock response for your real model through a single endpoint.</p>
+      <a class="button" href="docs.html">Read the API contract</a>
+    </section>
   </main>
 
+  <!-- FAQ -->
+  <section class="shell">
+    <h2 class="section-title">FAQ</h2>
+    <div class="faq">
+      <details><summary>Is the site live without running servers?</summary><p>Yes — GitHub Pages hosts the front end automatically. Only the API needs hosting.</p></details>
+      <details><summary>Do you store images?</summary><p>Mock API processes in-memory and discards. Your final setup decides retention.</p></details>
+      <details><summary>Is it really free?</summary><p>Yes. We may add pro features later, but core uploading is free.</p></details>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer class="shell footer">
     <div>© <span id="year"></span> SnapTraderNaija</div>
-    <div class="footer-links"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="docs.html">Docs</a><a href="https://github.com/myfxpaddy/snaptradernaija" target="_blank" rel="noreferrer">GitHub</a></div>
+    <div class="footer-links" style="display:flex; gap:14px;">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/myfxpaddy/snaptradernaija" target="_blank" rel="noreferrer">GitHub</a>
+    </div>
   </footer>
 
-  <!-- Modal -->
+  <!-- AUTH MODAL -->
   <dialog id="authModal" class="modal">
     <form method="dialog" class="modal-card" id="authForm">
       <h3 id="authTitle">Log in</h3>
@@ -92,11 +188,11 @@
     </form>
   </dialog>
 
-  <!-- Firebase + auth + app -->
+  <!-- Firebase + scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="firebaseConfig.js"></script>
   <script type="module" src="auth.js"></script>
-  <script src="app.js" type="module"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
