@@ -1,155 +1,110 @@
+cat <<'EOF' > dashboard.html
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-  <title>Dashboard · SnapTraderNaija</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SnapTraderNaija — Dashboard</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-  <!-- SAME ANIMATED BACKGROUND AS HOMEPAGE -->
-  <div class="bg">
-    <div class="grid-lines"></div>
-    <div class="glow g1"></div>
-    <div class="glow g2"></div>
-    <div class="glow g3"></div>
-  </div>
-
-  <!-- SAME NAV AS HOMEPAGE -->
-  <nav class="nav">
-    <div class="nav-inner shell">
-      <a class="brand-inline" href="./" aria-label="SnapTraderNaija">
-        <img src="logo.svg" alt="" class="logo"/>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a href="./" class="brand-inline" aria-label="SnapTraderNaija">
+        <img src="logo.svg" alt="" class="logo" />
         <span class="brand-name">SnapTraderNaija</span>
       </a>
-
-      <button class="hamburger" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
-
-      <div class="nav-links" id="navLinks">
-        <a href="index.html#features">Features</a>
-        <a href="index.html#how">How it works</a>
-        <a href="index.html#tool">Try it</a>
-        <a href="docs.html">Docs</a>
-        <a href="about.html">About</a>
-        <div class="nav-actions">
-          <button class="themeToggle" type="button" title="Toggle theme">🌗</button>
-          <a class="ghost small" href="login.html">Log in</a>
-          <a class="small" href="signup.html">Sign up</a>
-          <button class="ghost small logoutBtn only-logged-in hidden" type="button">Logout</button>
-        </div>
-      </div>
+      <nav class="nav" style="margin-left:auto;display:flex;gap:12px;">
+        <a href="./" class="ghost btn small">Home</a>
+        <a href="docs.html" class="ghost btn small">Docs</a>
+        <button class="btn small logoutBtn only-logged-in hidden" id="logoutBtn">Logout</button>
+      </nav>
     </div>
-  </nav>
+  </header>
 
-  <!-- PAGE CONTENT IN THE SAME SHELL LAYOUT -->
-  <main class="shell" style="padding-top:24px;">
-    <h1 class="section-title" style="margin-bottom:4px;">Dashboard</h1>
-    <p class="muted" style="margin-bottom:16px;">Overview of your analyses and performance.</p>
+  <main class="page" style="position:relative;z-index:1;">
+    <h1 class="h2" style="margin-top:8px;">Dashboard</h1>
+    <p class="muted">Overview of your analyses and performance. <span id="derivStatus" class="tiny" style="margin-left:8px;">Deriv: idle</span></p>
 
-    <!-- STATS CARDS (use same .card style as home) -->
-    <section class="grid" style="grid-template-columns:repeat(4,minmax(220px,1fr)); gap:14px; margin-bottom:16px;">
-      <article class="card stat">
-        <div class="label">Total Signals</div>
-        <div class="value" id="statTotal">—</div>
-      </article>
-      <article class="card stat">
-        <div class="label">Win Rate</div>
-        <div class="value" id="statWinRate">—</div>
-      </article>
-      <article class="card stat">
-        <div class="label">Total Pips</div>
-        <div class="value" id="statPips">—</div>
-      </article>
-      <article class="card stat">
-        <div class="label">Best Instrument</div>
-        <div class="value" id="statBest">—</div>
-      </article>
+    <section class="grid-4 section-pad" style="padding-left:0;padding-right:0;">
+      <div class="card stat"><div class="label">Total Signals</div><div class="val" id="k_total">—</div></div>
+      <div class="card stat"><div class="label">Win Rate</div><div class="val" id="k_winrate">—</div></div>
+      <div class="card stat"><div class="label">Total Pips</div><div class="val" id="k_pips">—</div></div>
+      <div class="card stat"><div class="label">Best Instrument</div><div class="val" id="k_best">—</div></div>
     </section>
 
-    <!-- LIVE TICKERS (CAROUSELS) -->
-    <section class="card" style="margin-bottom:16px;">
-      <h3 class="section-title" style="margin-bottom:8px;">Live Crypto</h3>
-      <div class="carousel-wrap">
-        <button class="car-btn left" data-target="crypto" aria-label="Prev">‹</button>
+    <section class="card section-pad" id="liveCarousels">
+      <h3 class="h2" style="font-size:20px;">Live Crypto</h3>
+      <div class="carousel-wrap" style="margin-top:8px;">
+        <button class="car-btn left"  data-target="crypto">‹</button>
+        <button class="car-btn right" data-target="crypto">›</button>
+        <div class="edge-mask left"></div>
+        <div class="edge-mask right"></div>
         <div class="carousel" data-carousel="crypto">
-          <article class="card tile ticker" data-ticker="BTCUSD">
-            <div class="tile-body"><div class="sy">BTCUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
-          </article>
-          <article class="card tile ticker" data-ticker="ETHUSD">
-            <div class="tile-body"><div class="sy">ETHUSD</div><div class="px price">—</div><div class="sub">Binance</div></div>
-          </article>
+          <div class="card tile ticker" data-ticker="BTCUSD">
+            <div class="tile-body">
+              <div><div class="sy">BTCUSD</div><div class="sub">Deriv</div></div>
+              <div class="px price">—</div>
+            </div>
+          </div>
+          <div class="card tile ticker" data-ticker="ETHUSD">
+            <div class="tile-body">
+              <div><div class="sy">ETHUSD</div><div class="sub">Deriv</div></div>
+              <div class="px price">—</div>
+            </div>
+          </div>
         </div>
-        <button class="car-btn right" data-target="crypto" aria-label="Next">›</button>
-        <div class="edge-mask left"></div><div class="edge-mask right"></div>
       </div>
 
-      <h3 class="section-title" style="margin:18px 0 8px;">Forex (majors)</h3>
-      <div class="carousel-wrap">
-        <button class="car-btn left" data-target="forex" aria-label="Prev">‹</button>
+      <h3 class="h2" style="font-size:20px;margin-top:18px;">Forex (majors)</h3>
+      <div class="carousel-wrap" style="margin-top:8px;">
+        <button class="car-btn left"  data-target="forex">‹</button>
+        <button class="car-btn right" data-target="forex">›</button>
+        <div class="edge-mask left"></div>
+        <div class="edge-mask right"></div>
         <div class="carousel" data-carousel="forex">
-          <article class="card tile ticker" data-ticker="EURUSD"><div class="tile-body"><div class="sy">EURUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-          <article class="card tile ticker" data-ticker="GBPUSD"><div class="tile-body"><div class="sy">GBPUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-          <article class="card tile ticker" data-ticker="USDJPY"><div class="tile-body"><div class="sy">USDJPY</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-          <article class="card tile ticker" data-ticker="USDCHF"><div class="tile-body"><div class="sy">USDCHF</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-          <article class="card tile ticker" data-ticker="AUDUSD"><div class="tile-body"><div class="sy">AUDUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-          <article class="card tile ticker" data-ticker="USDCAD"><div class="tile-body"><div class="sy">USDCAD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-          <article class="card tile ticker" data-ticker="NZDUSD"><div class="tile-body"><div class="sy">NZDUSD</div><div class="px price">—</div><div class="sub">FX</div></div></article>
-        </div>
-        <button class="car-btn right" data-target="forex" aria-label="Next">›</button>
-        <div class="edge-mask left"></div><div class="edge-mask right"></div>
-      </div>
-
-      <p class="muted tiny" style="margin-top:8px;">Crypto via Binance WS. FX via FreeForexAPI (fallback: ExchangeRate.Host) every ~5s.</p>
-    </section>
-
-    <!-- UPLOAD -->
-    <section class="card" style="margin-bottom:16px;">
-      <label class="uploader glass drop fancy" for="file" id="dropArea" style="display:block;">
-        <input id="file" type="file" accept="image/png,image/jpeg"/>
-        <div class="drop-graphic"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div></div>
-        <span class="drop-text"><b>Upload</b> or drag a chart screenshot<br/><small>PNG or JPG — up to 10MB</small></span>
-        <img class="preview hidden" id="preview" alt="preview"/>
-      </label>
-      <div class="actions">
-        <button type="button" id="analyzeBtn" class="button">Analyze</button>
-        <a class="ghost button" href="index.html#tool">Use the home tool</a>
-        <button type="button" id="clearBtn" class="ghost button">Clear</button>
-      </div>
-      <div id="progress" class="progress hidden"><div class="bar" id="bar"></div><span id="progressText">Uploading…</span></div>
-      <p id="error" class="error hidden"></p>
-    </section>
-
-    <!-- ANALYSES TABLE -->
-    <section class="card">
-      <div class="grid" style="grid-template-columns:auto auto; align-items:center;">
-        <h3>Your Analyses</h3>
-        <div style="justify-self:end;">
-          <a class="ghost button" href="index.html">Upload another</a>
-          <button class="ghost button" id="refreshAnalyses">Refresh</button>
+          <div class="card tile ticker" data-ticker="EURUSD"><div class="tile-body"><div><div class="sy">EURUSD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="GBPUSD"><div class="tile-body"><div><div class="sy">GBPUSD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="USDJPY"><div class="tile-body"><div><div class="sy">USDJPY</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="USDCHF"><div class="tile-body"><div><div class="sy">USDCHF</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="AUDUSD"><div class="tile-body"><div><div class="sy">AUDUSD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="USDCAD"><div class="tile-body"><div><div class="sy">USDCAD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="NZDUSD"><div class="tile-body"><div><div class="sy">NZDUSD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
         </div>
       </div>
-      <div class="table-wrap" style="margin-top:10px;">
+      <p class="tiny muted mt-1">Live prices via Deriv WebSocket. Set once (Console): <code>localStorage.setItem('deriv_app_id','82105')</code></p>
+    </section>
+
+    <section class="card section-pad">
+      <div class="between">
+        <h3 class="h2" style="font-size:20px;">Your Analyses</h3>
+        <div class="flex">
+          <button class="btn small ghost" id="refreshBtn">Refresh</button>
+          <a class="btn small" href="./">Upload another</a>
+        </div>
+      </div>
+      <div class="table-wrap mt-2">
         <table>
-          <thead>
-            <tr><th>Date</th><th>Symbol</th><th>Dir</th><th>Score</th><th>Entry</th><th>TP</th><th>SL</th><th>R:R</th><th>Status</th><th>Δ pips</th></tr>
-          </thead>
-          <tbody id="rowsAnalyses"><tr><td colspan="10" style="text-align:center; opacity:.7;">No analyses yet.</td></tr></tbody>
+          <thead><tr>
+            <th>Date</th><th>Symbol</th><th>Dir</th><th>Score</th><th>Entry</th><th>TP</th><th>SL</th><th>R:R</th><th>Status</th><th>Δ pips</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
         </table>
       </div>
     </section>
   </main>
 
-  <!-- SCRIPTS -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebaseConfig.js"></script>
   <script type="module" src="auth.js"></script>
-  <script type="module" src="dashboard.js"></script>
   <script type="module" src="theme.js"></script>
+  <script type="module" src="dashboard.js?v=deriv3"></script>
 </body>
 </html>
+EOF
 
