@@ -1,42 +1,48 @@
 import { getIdToken, onAuthChange } from "./auth.js";
 
-const API_BASE   = localStorage.getItem("apiBase") || "http://localhost:8787";
-const rowsEl     = document.getElementById("rows");
-const k_total    = document.getElementById("k_total");
-const k_winrate  = document.getElementById("k_winrate");
-const k_pips     = document.getElementById("k_pips");
-const k_best     = document.getElementById("k_best");
+/* =================== CONFIG =================== */
+const API_BASE = localStorage.getItem("apiBase") || "http://localhost:8787";
+/* Deriv app id must be set once in the browser console:
+   localStorage.setItem('deriv_app_id','YOUR_APP_ID_NUMBER')
+   And be sure myfxpaddy.github.io is authorized in the Deriv app. */
 
-/* ---------- helpers ---------- */
+/* =================== KPIs + TABLE =================== */
+const rowsEl = document.getElementById("rows");
+const k_total = document.getElementById("k_total");
+const k_winrate = document.getElementById("k_winrate");
+const k_pips = document.getElementById("k_pips");
+const k_best = document.getElementById("k_best");
+
 function statusFor(a, price){
-  let status = "OPEN", dpips = 0;
-  if(a.direction === "BUY"){
-    if(price >= a.tp) status = "WIN";
-    else if(price <= a.sl) status = "LOSS";
-    dpips = (price - a.entry) / a.pipSize;
-  }else if(a.direction === "SELL"){
-    if(price <= a.tp) status = "WIN";
-    else if(price >= a.sl) status = "LOSS";
-    dpips = (a.entry - price) / a.pipSize;
+  let status="OPEN", dpips=0;
+  if(a.direction==="BUY"){
+    if(price>=a.tp) status="WIN";
+    else if(price<=a.sl) status="LOSS";
+    dpips = ((price - a.entry)/a.pipSize);
+  }else if(a.direction==="SELL"){
+    if(price<=a.tp) status="WIN";
+    else if(price>=a.sl) status="LOSS";
+    dpips = ((a.entry - price)/a.pipSize);
   }
-  return { status, dpips: Math.round(dpips*10)/10 };
+  return {status, dpips: Math.round(dpips*10)/10};
 }
 
-/* ---------- load saved analyses + KPIs ---------- */
 async function loadAll(){
   const token = await getIdToken();
-  if(!token){ location.href = "./"; return; }
+  if(!token){ location.href="./"; return; }
 
-  const r  = await fetch(`${API_BASE}/me/analyses`, { headers:{ Authorization:`Bearer ${token}` }});
-  const js = await r.json();
-  const items = js.items || [];
+  const res = await fetch(`${API_BASE}/me/analyses`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const items = (await res.json()).items || [];
 
-  const syms = Array.from(new Set(items.map(i => i.symbol || "XAUUSD"))).join(",");
+  // Prices for KPIs table (uses last known entry if live not available here)
+  const syms = Array.from(new Set(items.map(i=>i.symbol || "XAUUSD"))).join(",");
   const pRes = await fetch(`${API_BASE}/prices?symbols=${encodeURIComponent(syms)}`);
   const prices = await pRes.json();
 
   rowsEl && (rowsEl.innerHTML = "");
-  let wins=0,total=0,pipSum=0;
+  let wins=0, total=0, pipSum=0;
   const bySym = {};
   items.forEach(a=>{
     const sym = a.symbol || "XAUUSD";
@@ -60,120 +66,121 @@ async function loadAll(){
         <td>${a.sl}</td>
         <td>${(a.rr||0).toFixed?.(2) ?? a.rr}</td>
         <td>${status}</td>
-        <td>${dpips}</td>`;
+        <td>${dpips}</td>
+      `;
       rowsEl.appendChild(tr);
     }
   });
 
-  if(k_total)   k_total.textContent   = String(items.length);
-  if(k_winrate) k_winrate.textContent = total ? `${Math.round((wins/total)*100)}%` : "—";
-  if(k_pips)    k_pips.textContent    = `${Math.round(pipSum*10)/10}`;
-  if(k_best){
-    const best = Object.entries(bySym).sort((a,b)=>b[1].pips-a[1].pips)[0];
-    k_best.textContent = best ? `${best[0]} (+${Math.round(best[1].pips)})` : "—";
-  }
+  k_total && (k_total.textContent = String(items.length));
+  k_winrate && (k_winrate.textContent = total ? `${Math.round((wins/total)*100)}%` : "—");
+  k_pips && (k_pips.textContent = `${Math.round(pipSum*10)/10}`);
+  const best = Object.entries(bySym).sort((a,b)=>b[1].pips-a[1].pips)[0];
+  k_best && (k_best.textContent = best ? `${best[0]} (+${Math.round(best[1].pips)})` : "—");
 }
 
-/* ---------- Deriv WS (BTCUSD/ETHUSD) ---------- */
-(function derivFeed(){
+document.getElementById("refreshBtn")?.addEventListener("click", loadAll);
+onAuthChange(u=>{ if(!u){ location.href="./"; return; } loadAll(); });
+
+/* =================== UPLOADER UX =================== */
+(function(){
+  const drop = document.getElementById("dropVisual");
+  const file = document.getElementById("file");
+  if(!drop || !file) return;
+
+  const openPicker = (e)=>{ e && e.preventDefault(); file.click(); };
+  const browse = document.getElementById("browseBtn");
+  browse && browse.addEventListener("click", openPicker);
+  drop.addEventListener("click", (e)=>{ if(e.target.closest("button,a,label")) return; openPicker(e); });
+
+  ["dragenter","dragover"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("drag-over"); }));
+  ["dragleave","drop"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
+  drop.addEventListener("drop", (e)=>{ const dt=e.dataTransfer; if(dt && dt.files && dt.files[0]){ file.files = dt.files; file.dispatchEvent(new Event("change",{bubbles:true})); }});
+  ["dragover","drop"].forEach(ev=> window.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, true));
+})();
+
+/* =================== LIVE TICKERS =================== */
+/* ---- Crypto via Binance WS (no keys) ---- */
+(function(){
   const prev = { BTCUSD:null, ETHUSD:null };
-  const els  = {
-    BTCUSD: document.querySelector('[data-ticker="BTCUSD"]'),
-    ETHUSD: document.querySelector('[data-ticker="ETHUSD"]')
-  };
+  function el(sym){ return document.querySelector(`[data-ticker="${sym}"]`); }
   function render(sym, px){
-    const root = els[sym]; if(!root) return;
-    const priceEl = root.querySelector('.price') || root.querySelector('.px') ||
-      (()=>{ const d=document.createElement('div'); d.className='px price'; root.appendChild(d); return d;})();
+    const root = el(sym); if(!root) return;
+    const priceEl = root.querySelector('.price') || root.querySelector('.px') || (()=>{const d=document.createElement('div'); d.className='px price'; root.appendChild(d); return d;})();
     const old = prev[sym];
     root.classList.remove('up','down');
     if(old!=null){ if(px>old) root.classList.add('up'); else if(px<old) root.classList.add('down'); }
     priceEl.textContent = Number(px).toLocaleString(undefined,{maximumFractionDigits:2});
-    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 220);
-    prev[sym] = px;
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 200);
+    prev[sym]=px;
   }
-
-  const appId = Number(localStorage.getItem('deriv_app_id') || 0);
-  if(!appId){
-    console.warn('[Deriv] No app_id set. Run: localStorage.setItem("deriv_app_id","YOUR_APP_ID")');
-    return;
-  }
-  const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${appId}`);
-  ws.onopen = ()=>{
-    ws.send(JSON.stringify({ ticks:'BTCUSD', subscribe:1 }));
-    ws.send(JSON.stringify({ ticks:'ETHUSD', subscribe:1 }));
-  };
-  ws.onmessage = (ev)=>{
+  function openWS(){
     try{
-      const m = JSON.parse(ev.data);
-      if(m.error){ console.warn('[Deriv error]', m.error); return; }
-      if(m.msg_type === 'tick' && m.tick && m.tick.symbol && m.tick.quote){
-        const s = m.tick.symbol; // e.g., BTCUSD
-        if(s === 'BTCUSD' || s === 'ETHUSD') render(s, Number(m.tick.quote));
-      }
-    }catch(_e){}
-  };
-  ws.onclose = ()=> setTimeout(derivFeed, 1500);
-  ws.onerror = ()=> { try{ ws.close(); }catch(_e){} };
+      const ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@trade/ethusdt@trade');
+      ws.onmessage = (evt)=>{ const d=JSON.parse(evt.data); const s=d?.data?.s; const p=parseFloat(d?.data?.p);
+        if(!s || !Number.isFinite(p)) return;
+        render(s==='BTCUSDT'?'BTCUSD': s==='ETHUSDT'?'ETHUSD': null, p);
+      };
+      ws.onclose = ()=> setTimeout(openWS, 1500);
+      ws.onerror = ()=> { try{ ws.close(); }catch(_){} };
+    }catch(e){ setTimeout(openWS, 2500); }
+  }
+  openWS();
 })();
 
-/* ---------- Forex majors (FreeForexAPI -> fallback ExchangeRate.host) ---------- */
-(function fxFeed(){
-  const pairs = ['EURUSD','GBPUSD','USDJPY','USDCHF','AUDUSD','USDCAD','NZDUSD'];
-  const prev  = Object.fromEntries(pairs.map(p=>[p,null]));
-  const els   = Object.fromEntries(pairs.map(p=>[p, document.querySelector(`[data-ticker="${p}"]`)]));
+/* ---- FX via Deriv WS (needs localStorage.deriv_app_id) ---- */
+(function(){
+  const app_id = localStorage.getItem('deriv_app_id');
+  if(!app_id){
+    console.warn('[Deriv FX] Set localStorage.deriv_app_id to your App ID, and authorize myfxpaddy.github.io in the Deriv app.');
+    return;
+  }
 
+  // Deriv symbols → your tile keys
+  const symbols = [
+    'frxEURUSD','frxGBPUSD','frxUSDJPY','frxUSDCHF','frxAUDUSD','frxUSDCAD','frxNZDUSD'
+  ];
+  const mapToTile = {
+    frxEURUSD:'EURUSD', frxGBPUSD:'GBPUSD', frxUSDJPY:'USDJPY',
+    frxUSDCHF:'USDCHF', frxAUDUSD:'AUDUSD', frxUSDCAD:'USDCAD', frxNZDUSD:'NZDUSD'
+  };
+  const prev = Object.fromEntries(Object.values(mapToTile).map(k=>[k,null]));
+
+  function el(sym){ return document.querySelector(`[data-ticker="${sym}"]`); }
   function render(sym, px){
-    const root = els[sym]; if(!root) return;
-    const priceEl = root.querySelector('.price') || root.querySelector('.px') ||
-      (()=>{ const d=document.createElement('div'); d.className='px price'; root.appendChild(d); return d;})();
+    const root = el(sym); if(!root) return;
+    const priceEl = root.querySelector('.price') || root.querySelector('.px') || (()=>{const d=document.createElement('div'); d.className='px price'; root.appendChild(d); return d;})();
     const old = prev[sym];
     root.classList.remove('up','down');
     if(old!=null){ if(px>old) root.classList.add('up'); else if(px<old) root.classList.add('down'); }
-    priceEl.textContent = Number(px).toLocaleString(undefined,{maximumFractionDigits: sym.endsWith('JPY')?3:5});
-    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 220);
-    prev[sym] = px;
+    priceEl.textContent = Number(px).toLocaleString(undefined,{ maximumFractionDigits: sym.endsWith('JPY')?3:5 });
+    priceEl.classList.add('tick-blip'); setTimeout(()=> priceEl.classList.remove('tick-blip'), 200);
+    prev[sym]=px;
   }
 
-  async function pollFreeForex(){
-    const r = await fetch(`https://www.freeforexapi.com/api/live?pairs=${pairs.join(',')}`, {cache:'no-store'});
-    if(!r.ok) throw new Error('freeforex not ok');
-    const j = await r.json();
-    const rates = j?.rates || {};
-    pairs.forEach(k=>{ const v = rates[k]?.rate; if(Number.isFinite(v)) render(k,v); });
-  }
-  async function pollERH(){
-    const resp = await fetch('https://api.exchangerate.host/latest?base=USD', {cache:'no-store'});
-    const j = await resp.json();
-    const R = j?.rates || {};
-    const map = {
-      EURUSD: 1/(R.EUR ? 1/R.EUR : NaN),
-      GBPUSD: 1/(R.GBP ? 1/R.GBP : NaN),
-      USDJPY: R.JPY, USDCHF: R.CHF, USDCAD: R.CAD,
-      AUDUSD: 1/(R.AUD ? 1/R.AUD : NaN),
-      NZDUSD: 1/(R.NZD ? 1/R.NZD : NaN)
-    };
-    Object.entries(map).forEach(([k,v])=> Number.isFinite(v) && render(k,v));
-  }
-  async function tick(){ try{ await pollFreeForex(); }catch(_){ try{ await pollERH(); }catch(__){} } }
-  tick(); setInterval(tick, 5000);
+  (function openWS(){
+    try{
+      const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${encodeURIComponent(app_id)}`);
+      ws.onopen = () => {
+        console.log('[Deriv FX] WS open');
+        symbols.forEach(sym => ws.send(JSON.stringify({ ticks: sym, subscribe: 1 })));
+      };
+      ws.onmessage = (evt) => {
+        try{
+          const msg = JSON.parse(evt.data);
+          if(msg.msg_type === 'tick' && msg.tick){
+            const dSym = msg.tick.symbol;         // e.g. frxEURUSD
+            const quote = Number(msg.tick.quote);
+            const tile = mapToTile[dSym];
+            if(tile && Number.isFinite(quote)) render(tile, quote);
+          }else if(msg.error){
+            console.warn('[Deriv FX] error:', msg.error);
+          }
+        }catch(_){}
+      };
+      ws.onclose = () => { console.warn('[Deriv FX] closed; retrying…'); setTimeout(openWS, 1500); };
+      ws.onerror = () => { try{ ws.close(); }catch(_){} };
+    }catch(e){ setTimeout(openWS, 2500); }
+  })();
 })();
-
-/* ---------- Uploader UX (big dropzone) ---------- */
-(function uploaderUX(){
-  const drop   = document.getElementById("dropVisual");
-  const file   = document.getElementById("file");
-  const browse = document.getElementById("browseBtn");
-  function openPicker(e){ e && e.preventDefault(); if(file) file.click(); }
-  browse && browse.addEventListener("click", openPicker);
-  drop   && drop.addEventListener("click", (e)=>{ if(e.target.closest("button,a,label")) return; openPicker(e); });
-  ["dragenter","dragover"].forEach(ev=> drop && drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("drag-over"); }));
-  ["dragleave","drop"].forEach(ev=>   drop && drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("drag-over"); }));
-  drop && drop.addEventListener("drop",(e)=>{ const dt=e.dataTransfer; if(dt && dt.files && dt.files[0]){ file.files=dt.files; file.dispatchEvent(new Event("change",{bubbles:true})); }});
-  ["dragover","drop"].forEach(ev=> window.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, true));
-})();
-
-/* ---------- protect page ---------- */
-document.getElementById("refreshBtn")?.addEventListener("click", loadAll);
-onAuthChange(u=>{ if(!u){ location.href="./"; return; } loadAll(); });
 
