@@ -14,7 +14,7 @@ cat <<'EOF' > dashboard.html
   <header class="site-header">
     <div class="nav-wrap">
       <a href="./" class="brand-inline" aria-label="SnapTraderNaija">
-        <img src="logo.svg" alt="" class="logo" />
+        <img src="logo.svg" alt="" class="logo"/>
         <span class="brand-name">SnapTraderNaija</span>
       </a>
       <nav class="nav" style="margin-left:auto;display:flex;gap:12px;">
@@ -29,6 +29,7 @@ cat <<'EOF' > dashboard.html
     <h1 class="h2" style="margin-top:8px;">Dashboard</h1>
     <p class="muted">Overview of your analyses and performance. <span id="derivStatus" class="tiny" style="margin-left:8px;">Deriv: idle</span></p>
 
+    <!-- KPIs -->
     <section class="grid-4 section-pad" style="padding-left:0;padding-right:0;">
       <div class="card stat"><div class="label">Total Signals</div><div class="val" id="k_total">—</div></div>
       <div class="card stat"><div class="label">Win Rate</div><div class="val" id="k_winrate">—</div></div>
@@ -36,6 +37,7 @@ cat <<'EOF' > dashboard.html
       <div class="card stat"><div class="label">Best Instrument</div><div class="val" id="k_best">—</div></div>
     </section>
 
+    <!-- Live tickers -->
     <section class="card section-pad" id="liveCarousels">
       <h3 class="h2" style="font-size:20px;">Live Crypto</h3>
       <div class="carousel-wrap" style="margin-top:8px;">
@@ -44,18 +46,8 @@ cat <<'EOF' > dashboard.html
         <div class="edge-mask left"></div>
         <div class="edge-mask right"></div>
         <div class="carousel" data-carousel="crypto">
-          <div class="card tile ticker" data-ticker="BTCUSD">
-            <div class="tile-body">
-              <div><div class="sy">BTCUSD</div><div class="sub">Deriv</div></div>
-              <div class="px price">—</div>
-            </div>
-          </div>
-          <div class="card tile ticker" data-ticker="ETHUSD">
-            <div class="tile-body">
-              <div><div class="sy">ETHUSD</div><div class="sub">Deriv</div></div>
-              <div class="px price">—</div>
-            </div>
-          </div>
+          <div class="card tile ticker" data-ticker="BTCUSD"><div class="tile-body"><div><div class="sy">BTCUSD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
+          <div class="card tile ticker" data-ticker="ETHUSD"><div class="tile-body"><div><div class="sy">ETHUSD</div><div class="sub">Deriv</div></div><div class="px price">—</div></div></div>
         </div>
       </div>
 
@@ -78,6 +70,22 @@ cat <<'EOF' > dashboard.html
       <p class="tiny muted mt-1">Live prices via Deriv WebSocket. Set once (Console): <code>localStorage.setItem('deriv_app_id','82105')</code></p>
     </section>
 
+    <!-- Upload (back by request) -->
+    <section class="card section-pad">
+      <h3 class="h2" style="font-size:20px;">Upload or drag a chart screenshot</h3>
+      <div id="dropVisual" class="drop-visual">
+        <div class="icon">⬆</div>
+        <h2 style="margin:6px 0 0 0;">Browse image <span class="helper tiny">or drag &amp; drop</span></h2>
+        <input id="file" type="file" accept="image/png,image/jpeg" style="display:none"/>
+        <div class="dashed"></div>
+        <div class="row">
+          <button id="browseBtn" class="btn small">Browse image</button>
+          <a class="ghost btn small" href="./#tool">Use the home tool</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Your analyses -->
     <section class="card section-pad">
       <div class="between">
         <h3 class="h2" style="font-size:20px;">Your Analyses</h3>
@@ -97,13 +105,14 @@ cat <<'EOF' > dashboard.html
     </section>
   </main>
 
+  <!-- Firebase + scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebaseConfig.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="theme.js"></script>
-  <script type="module" src="dashboard.js?v=deriv3"></script>
+  <script type="module" src="dashboard.js?v=deriv4"></script>
 </body>
 </html>
 EOF
